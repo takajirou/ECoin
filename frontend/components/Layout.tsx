@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 import Header from './Header';
+import Footer from './Footer';
 import { LinearGradient } from 'expo-linear-gradient';
 
 type Props = {
@@ -16,6 +17,7 @@ const Layout: React.FC<Props> = ({ children }) => {
                 <View style={styles.inner}>{children}</View>
             </View>
         </LinearGradient>
+        <Footer />
     </View>
     );
 };

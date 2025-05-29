@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "ECoin",
+    "slug": "ECoin",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/coin.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
