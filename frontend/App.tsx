@@ -4,7 +4,7 @@ import Layout from './components/Layout';
 export default function App() {
   return (
     <Layout>
-      <Text>あ</Text>
+      <Text>マジ卍</Text>
     </Layout>
   );
 }
