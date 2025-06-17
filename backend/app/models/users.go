@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"log"  // ログ出力用（エラー時に使用）
 	"time" // 日時の取得・管理に使用
 )
@@ -65,11 +66,11 @@ func GetUser(id int) (user User, err error) {
 
 
 func (u *User) UpdateUser() (err error){
+	if u.ID == 0 {
+		return errors.New("invalid user ID")
+	}
 	cmd := `update users set name = ?, email = ? where id = ?`
 	_, err = Db.Exec(cmd, u.Name, u.Email, u.ID)
-	if  err != nil{
-		log.Fatalln(err)
-	}
 	return err
 }
 
@@ -80,4 +81,33 @@ func (u *User) DeleteUser() (err error){
 		log.Fatalln(err)
 	}
 	return err
+}
+
+// GetAllUsers 関数：全ユーザー情報をデータベースから取得してスライスで返す
+func GetAllUsers() ([]User, error) {
+	// SQL文：全ユーザーの情報を取得
+	rows, err := Db.Query(`SELECT id, uuid, name, email, password, created_at FROM users`)
+	if err != nil {
+		return nil, err // エラーがあればnilとエラーを返す
+	}
+	defer rows.Close() // 処理が終わったらクローズ
+
+	var users []User // 結果を格納するスライス
+
+	for rows.Next() {
+		var u User
+		err := rows.Scan(
+			&u.ID,
+			&u.UUID,
+			&u.Name,
+			&u.Email,
+			&u.Password,
+			&u.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, u) // 取得したユーザーをスライスに追加
+	}
+	return users, nil
 }

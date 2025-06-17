@@ -1,11 +1,12 @@
 package models
 
 import (
-	"crypto/sha1"
+	"ECoin/config" // 外部設定（config.go）から読み込む
+	"crypto/sha256"
 	"database/sql" // データベース操作に使用する標準パッケージ
-	"fmt"          // 文字列の整形に使用（SQL文の動的生成）
-	"log"          // ログ出力用
-	"todo/config"  // 外部設定（config.go）から読み込む
+	"encoding/hex"
+	"fmt" // 文字列の整形に使用（SQL文の動的生成）
+	"log" // ログ出力用
 
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3" // SQLiteドライバ。明示的には使わないが、必要なため空インポートする
@@ -50,7 +51,7 @@ func createUUID() (uuidobj uuid.UUID){
 	return uuidobj
 }
 
-func Encrypt(plaintext string) (cryptext string){
-	cryptext = fmt.Sprintf("%x", sha1.Sum([]byte(plaintext)))
-	return cryptext
+func Encrypt(pw string) string {
+	hash := sha256.Sum256([]byte(pw))
+	return hex.EncodeToString(hash[:])
 }

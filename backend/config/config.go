@@ -1,8 +1,8 @@
 package config
 
 import (
+	"ECoin/utils"
 	"log" // エラーとかを表示するために使う
-	"todo/utils"
 
 	"gopkg.in/ini.v1" // iniファイルを読み込むためのパッケージを読み込む
 )
