@@ -1,16 +1,22 @@
-import { StyleSheet, Text, View } from 'react-native';
-import Layout from './components/Layout';
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-export default function App() {
+
+import HomeScreen from './screen/HomeScreen';
+import DetailsScreen from './screen/DetailsScreen';
+
+const Stack = createNativeStackNavigator();
+
+function App() {
   return (
-    <Layout>
-      <Text>マジ卍</Text>
-    </Layout>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown : false }}>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Detail" component={DetailsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-
-  },
-});
+export default App;
