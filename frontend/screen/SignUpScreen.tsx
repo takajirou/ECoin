@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Button, TextInput, SafeAreaView, StyleSheet } from "react-native";
+import { SafeAreaView, TextInput, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Layout from "../components/Layout";
 import { useState } from "react";
@@ -22,47 +22,103 @@ const SignUpScreen = () => {
     const [passWord, setPassword] = useState("");
     const [email, setEmail] = useState("");
 
-    const CreateAcount = () => {
-        api.post("/users", { name: name, email: email, password: passWord });
+    const CreateAcount = async () => {
+        try {
+            await api.post("/users", { name: name, email: email, password: passWord });
+            console.log("アカウント作成成功");
+        } catch (error) {
+            console.error("アカウント作成エラー:", error);
+        }
     };
 
     return (
-        <SafeAreaView style={styles.SignUpWrap}>
-            <Text>新規登録</Text>
-            <TextInput
-                value={name}
-                placeholder="名前"
-                onChangeText={setName}
-                style={styles.InputField}
-            />
-            <TextInput
-                value={email}
-                placeholder="メールアドレス"
-                keyboardType="email-address"
-                onChangeText={setEmail}
-                style={styles.InputField}
-            />
-            <TextInput
-                value={passWord}
-                placeholder="パスワード"
-                onChangeText={setPassword}
-                style={styles.InputField}
-            />
-            <Button title="アカウント作成" onPress={CreateAcount} />
+        <SafeAreaView style={styles.container}>
+            <View style={styles.formContainer}>
+                <Text style={styles.title}>新規登録</Text>
+
+                <TextInput
+                    style={styles.input}
+                    value={name}
+                    placeholder="名前"
+                    onChangeText={setName}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    placeholderTextColor="#999"
+                />
+
+                <TextInput
+                    style={styles.input}
+                    value={email}
+                    placeholder="メールアドレス"
+                    keyboardType="email-address"
+                    onChangeText={setEmail}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    placeholderTextColor="#999"
+                />
+
+                <TextInput
+                    style={styles.input}
+                    value={passWord}
+                    placeholder="パスワード"
+                    onChangeText={setPassword}
+                    secureTextEntry={true}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    placeholderTextColor="#999"
+                />
+
+                <TouchableOpacity style={styles.button} onPress={CreateAcount}>
+                    <Text style={styles.buttonText}>アカウント作成</Text>
+                </TouchableOpacity>
+            </View>
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
-    InputField: {
-        width: "100%",
-        margin: "auto",
-        padding: 10,
-        borderWidth: 1,
-        borderColor: "#000",
+    container: {
+        flex: 1,
+        backgroundColor: "#f5f5f5",
     },
-    SignUpWrap: {
-        padding: 10,
+    formContainer: {
+        flex: 1,
+        justifyContent: "center",
+        paddingHorizontal: 20,
+        maxWidth: 400,
+        alignSelf: "center",
+        width: "100%",
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: "bold",
+        textAlign: "center",
+        marginBottom: 40,
+        color: "#333",
+    },
+    input: {
+        height: 50,
+        borderWidth: 1,
+        borderColor: "#ddd",
+        borderRadius: 8,
+        paddingHorizontal: 15,
+        marginBottom: 20,
+        backgroundColor: "#fff",
+        fontSize: 16,
+        color: "#333",
+    },
+    button: {
+        backgroundColor: "#007AFF",
+        height: 50,
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 10,
+    },
+    buttonText: {
+        color: "#fff",
+        fontSize: 18,
+        fontWeight: "bold",
     },
 });
 
