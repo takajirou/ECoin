@@ -16,7 +16,6 @@ type User struct {
 	CreatedAt time.Time // ユーザー登録日時
 }
 
-// CreateUser メソッド：User構造体の値を使ってデータベースに新しいユーザーを登録する
 func (u *User) CreateUser() (err error) {
 	// ユーザー情報を挿入するSQL文（? はプレースホルダ）
 	cmd := `insert into users(
@@ -26,15 +25,15 @@ func (u *User) CreateUser() (err error) {
 		password,
 		created_at) values (?, ?, ?, ?, ?)`
 	
-	// SQL実行（UUID生成・パスワードはハッシュ化、日時は現在時刻を使用）
+	// SQL実行
 	_, err = Db.Exec(cmd,
-		createUUID(),           // UUIDはランダムに生成
-		u.Name,                 // 入力された名前
-		u.Email,                // 入力されたメールアドレス
-		Encrypt(u.Password),    // パスワードは暗号化して保存
-		time.Now())             // 登録日時は現在時刻
+		createUUID(),
+		u.Name,
+		u.Email,
+		Encrypt(u.Password),
+		time.Now())
 
-	// 実行時にエラーが発生した場合、ログに出力して終了
+	// エラー処理
 	if err != nil {
 		log.Fatalln(err)
 	}

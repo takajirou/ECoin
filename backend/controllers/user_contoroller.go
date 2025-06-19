@@ -1,10 +1,9 @@
-package controllers // このファイルは「controllers」パッケージに属する
+package controllers
 
 import (
 	"encoding/json" // JSONのエンコード・デコードに使う（構造体 <-> JSON文字列）
 	"io"            // HTTPリクエストボディの読み取りに使用
 
-	// デバッグ用にfmt.Printfなどが使える（今回は未使用）
 	"net/http" // HTTPサーバーやリクエストの処理に使用
 	"strconv"  // 文字列と数値の変換（例："1" → 1）
 	"strings"  // 文字列処理（例：パス分解など）
@@ -12,20 +11,18 @@ import (
 	"ECoin/app/models" // モデル層（DBとのやり取り）をインポート
 )
 
-// HandleUsers は /api/users に対するリクエストを処理する
 func HandleUsers(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-		case http.MethodPost: // HTTPメソッドが POST の場合（ユーザーの作成）
+		case http.MethodPost:
 			var u models.User // 空のUser構造体を作成
 			body, _ := io.ReadAll(r.Body) // リクエストボディ（JSON）を読み取り
 			json.Unmarshal(body, &u) // JSONをUser構造体に変換（デコード）
-			u.CreateUser() // モデル層の関数でデータベースにユーザーを登録
+			u.CreateUser()
 
 			// レスポンスとして成功メッセージをJSONで返す
 			json.NewEncoder(w).Encode(map[string]string{"message": "created"})
 
 		case http.MethodGet:
-			// 一覧取得処理
 			users, err := models.GetAllUsers()
 			if err != nil {
 				http.Error(w, "Failed to get users", http.StatusInternalServerError)
@@ -35,7 +32,6 @@ func HandleUsers(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(users) // JSONで返却
 
 		default:
-			// POST以外のメソッドは許可しない
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 }
