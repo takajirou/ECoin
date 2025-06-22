@@ -20,8 +20,14 @@ var err error
 
 // 使用するユーザーテーブル名を定数で定義
 const (
-	tableNameUser    = "users"
-	tableNameMission = "missions"
+	tableNameUser    	 = "users"
+	tableNameMission 	 = "missions"
+	tableNameUserMission = "user_mission"
+	tableNameScore 		 = "score"
+	tableNameRewards	 = "rewards"
+	tableNameUserRewards = "user_rewards"
+	tableNameEvents      = "events"
+	tableNameUserEvents  = "user_events"
 )
 
 
@@ -45,8 +51,6 @@ func init() {
 		city VARCHAR(100),
 		created_at DATETIME
 	)`, tableNameUser)
-
-	// 上記のSQLコマンドを実行（失敗してもエラー処理はしない）
 	Db.Exec(cmdU)
 
 	cmdM := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
@@ -59,8 +63,78 @@ func init() {
 		active boolean DEFAULT true,
 		created_at DATETIME
 	)`, tableNameMission)
+	Db.Exec(cmdM)
 
-Db.Exec(cmdM)
+	cmdUM := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
+		id INT PRIMARY KEY AUTO_INCREMENT,
+		user_id VARCHAR(36),
+		mission_id INT,
+		finished_at DATETIME,
+		proof_image_url VARCHAR(100),
+		period_type ENUM('all', 'week', 'month'),
+		period_value VARCHAR(100),
+		created_at DATETIME,
+		CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(uuid),
+		CONSTRAINT fk_mission FOREIGN KEY (mission_id) REFERENCES missions(id)
+	)`, tableNameUserMission)
+	Db.Exec(cmdUM)
+
+	cmdS := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
+		id INT PRIMARY KEY AUTO_INCREMENT,
+		user_id VARCHAR(36),
+		earn_coin INT,
+		period_type ENUM('all', 'week', 'month'),
+		period_value VARCHAR(100),
+		created_at DATETIME,
+		CONSTRAINT fk_score_user FOREIGN KEY (user_id) REFERENCES users(uuid)
+	)`, tableNameScore)
+	Db.Exec(cmdS)
+
+	cmdR := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
+		id INT PRIMARY KEY AUTO_INCREMENT,
+		name VARCHAR(100),
+		description TEXT,
+		required_points INT
+	)`, tableNameRewards)
+	Db.Exec(cmdR)
+
+	cmdUR := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
+		id INT PRIMARY KEY AUTO_INCREMENT,
+		user_id VARCHAR(36),
+		reward_id INT,
+		exchanged_at DATETIME,
+		CONSTRAINT fk_rewards_user FOREIGN KEY (user_id) REFERENCES users(uuid),
+		CONSTRAINT fk_reward FOREIGN KEY (reward_id) REFERENCES rewards(id)
+	)`, tableNameUserRewards)
+	Db.Exec(cmdUR)
+
+	cmdE := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
+		id INT PRIMARY KEY AUTO_INCREMENT,
+		request_user VARCHAR(36),
+		venue VARCHAR(255),
+		title VARCHAR(100),
+		description TEXT,
+		active BOOLEAN DEFAULT false,
+		meeting_time DATETIME,
+		end_time DATETIME,
+		point INT,
+		capacity INT,
+		requested_at DATETIME,
+		CONSTRAINT fk_event_user FOREIGN KEY (request_user) REFERENCES users(uuid)
+	)`, tableNameEvents)
+	Db.Exec(cmdE)
+
+	cmdUE := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
+		id INT PRIMARY KEY AUTO_INCREMENT,
+		event_id INT,
+		user_id VARCHAR(36),
+		active BOOLEAN DEFAULT true,
+		requested_at DATETIME,
+		CONSTRAINT fk_user_events_user FOREIGN KEY (user_id) REFERENCES users(uuid),
+		CONSTRAINT fk_user_events_event FOREIGN KEY (event_id) REFERENCES events(id)
+	)`, tableNameUserEvents)
+	Db.Exec(cmdUE)
+
 }
 
 func createUUID() (uuidobj uuid.UUID){
