@@ -39,7 +39,6 @@ func init() {
 		log.Fatalln("DB接続エラー:", err)
 	}
 
-	// ユーザー情報を保存するためのテーブルを定義（なければ作成）
 	cmdU := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
 		uuid VARCHAR(36) NOT NULL UNIQUE,
