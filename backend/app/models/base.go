@@ -34,12 +34,15 @@ func init() {
 
 	// ユーザー情報を保存するためのテーブルを定義（なければ作成）
 	cmdU := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s(
-		id INTEGER PRIMARY KEY AUTOINCREMENT, -- ユーザーID（自動採番）
-		uuid STRING NOT NULL UNIQUE,          -- UUID（重複不可）
-		name STRING,                          -- 名前
-		email STRING,                         -- メールアドレス
-		password STRING,                      -- パスワード（ハッシュ等）
-		created_at DATETIME                   -- 作成日時
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		uuid STRING NOT NULL UNIQUE,
+		name STRING,
+		email STRING,
+		password STRING,
+		created_at DATETIME,
+		coins INTEGER DEFAULT 0,
+		pref STRING,
+		city STRING
 	)`, tableNameUser)
 
 	// 上記のSQLコマンドを実行（失敗してもエラー処理はしない）

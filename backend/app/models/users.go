@@ -14,6 +14,9 @@ type User struct {
 	Email     string    // メールアドレス
 	Password  string    // パスワード（ハッシュ化前）
 	CreatedAt time.Time // ユーザー登録日時
+	Coins 	  int		// 所持コイン
+	Pref      string    // 住んでる県
+	City   	  string	// 住んでる市
 }
 
 func (u *User) CreateUser() (err error) {
@@ -23,7 +26,10 @@ func (u *User) CreateUser() (err error) {
 		name,
 		email,
 		password,
-		created_at) values (?, ?, ?, ?, ?)`
+		created_at,
+		coins,
+		pref,
+		city) values (?, ?, ?, ?, ?, ?, ? ,?)`
 	
 	// SQL実行
 	_, err = Db.Exec(cmd,
@@ -31,7 +37,11 @@ func (u *User) CreateUser() (err error) {
 		u.Name,
 		u.Email,
 		Encrypt(u.Password),
-		time.Now())
+		time.Now(),
+		u.Coins,
+		u.Pref,
+		u.City,
+	)
 
 	// エラー処理
 	if err != nil {
@@ -57,6 +67,9 @@ func GetUser(id int) (user User, err error) {
 		&user.Email,
 		&user.Password,
 		&user.CreatedAt,
+		&user.Coins,
+		&user.Pref,
+		&user.City,
 	)
 
 	// 構造体（user）とエラー（err）を返す
@@ -68,8 +81,8 @@ func (u *User) UpdateUser() (err error){
 	if u.ID == 0 {
 		return errors.New("invalid user ID")
 	}
-	cmd := `update users set name = ?, email = ? where id = ?`
-	_, err = Db.Exec(cmd, u.Name, u.Email, u.ID)
+	cmd := `UPDATE users SET name = ?, email = ?, coins = ?, pref = ?, city = ? WHERE id = ?`
+	_, err = Db.Exec(cmd, u.Name, u.Email, u.Coins, u.Pref, u.City, u.ID)
 	return err
 }
 
@@ -85,7 +98,7 @@ func (u *User) DeleteUser() (err error){
 // GetAllUsers 関数：全ユーザー情報をデータベースから取得してスライスで返す
 func GetAllUsers() ([]User, error) {
 	// SQL文：全ユーザーの情報を取得
-	rows, err := Db.Query(`SELECT id, uuid, name, email, password, created_at FROM users`)
+	rows, err := Db.Query(`SELECT id, uuid, name, email, password, created_at, coins, pref, city FROM users`)
 	if err != nil {
 		return nil, err // エラーがあればnilとエラーを返す
 	}
@@ -102,6 +115,9 @@ func GetAllUsers() ([]User, error) {
 			&u.Email,
 			&u.Password,
 			&u.CreatedAt,
+			&u.Coins,
+			&u.Pref,
+			&u.City,
 		)
 		if err != nil {
 			return nil, err
