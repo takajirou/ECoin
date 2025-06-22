@@ -3,9 +3,9 @@ package config
 import (
 	"ECoin/utils"
 	"fmt"
-	"log"
+	"os"
 
-	"gopkg.in/ini.v1"
+	"github.com/joho/godotenv"
 )
 
 // 設定を保持する構造体
@@ -25,27 +25,31 @@ var Config ConfigList
 
 // 最初に実行される
 func init() {
-	LoadConfig()
+	LoadEnv()
 	utils.LoggingSettings(Config.LogFile)
+	_ = godotenv.Load()
 }
 
-// iniファイルを読み込む
-func LoadConfig() {
-	cfg, err := ini.Load("config.ini")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
+// 環境変数を読み込む関数
+func LoadEnv() {
 	Config = ConfigList{
-		Port:      cfg.Section("web").Key("port").MustString("8080"),
-		LogFile:   cfg.Section("web").Key("logfile").MustString("webapp.log"),
-		SQLDriver: cfg.Section("db").Key("driver").String(),
-		DbUser:    cfg.Section("db").Key("user").String(),
-		DbPass:    cfg.Section("db").Key("password").String(),
-		DbHost:    cfg.Section("db").Key("host").MustString("127.0.0.1"),
-		DbPort:    cfg.Section("db").Key("port").MustString("3306"),
-		DbName:    cfg.Section("db").Key("name").String(),
+		Port:      getEnv("APP_PORT", "8080"),
+		LogFile:   getEnv("LOG_FILE", "webapp.log"),
+		SQLDriver: getEnv("DB_DRIVER", "mysql"),
+		DbUser:    os.Getenv("DB_USER"),
+		DbPass:    os.Getenv("DB_PASS"),
+		DbHost:    getEnv("DB_HOST", "127.0.0.1"),
+		DbPort:    getEnv("DB_PORT", "3306"),
+		DbName:    os.Getenv("DB_NAME"),
 	}
+}
+
+// fallback付きの環境変数取得関数
+func getEnv(key, fallback string) string {
+	if val := os.Getenv(key); val != "" {
+		return val
+	}
+	return fallback
 }
 
 // MySQL接続文字列を作る便利関数
