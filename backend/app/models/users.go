@@ -13,23 +13,24 @@ type User struct {
 	Name      string    // ユーザー名
 	Email     string    // メールアドレス
 	Password  string    // パスワード（ハッシュ化前）
-	CreatedAt time.Time // ユーザー登録日時
 	Coins 	  int		// 所持コイン
 	Pref      string    // 住んでる県
 	City   	  string	// 住んでる市
+	CreatedAt time.Time // ユーザー登録日時
 }
 
 func (u *User) CreateUser() (err error) {
 	// ユーザー情報を挿入するSQL文（? はプレースホルダ）
+	
 	cmd := `insert into users(
 		uuid,
 		name,
 		email,
 		password,
-		created_at,
 		coins,
 		pref,
-		city) values (?, ?, ?, ?, ?, ?, ? ,?)`
+		city,
+		created_at) values (?, ?, ?, ?, ?, ?, ?, ?)`
 	
 	// SQL実行
 	_, err = Db.Exec(cmd,
@@ -37,10 +38,10 @@ func (u *User) CreateUser() (err error) {
 		u.Name,
 		u.Email,
 		Encrypt(u.Password),
-		time.Now(),
 		u.Coins,
 		u.Pref,
 		u.City,
+		time.Now(),
 	)
 
 	// エラー処理
@@ -66,10 +67,10 @@ func GetUser(id int) (user User, err error) {
 		&user.Name,
 		&user.Email,
 		&user.Password,
-		&user.CreatedAt,
 		&user.Coins,
 		&user.Pref,
 		&user.City,
+		&user.CreatedAt,
 	)
 
 	// 構造体（user）とエラー（err）を返す

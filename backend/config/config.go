@@ -2,40 +2,59 @@ package config
 
 import (
 	"ECoin/utils"
-	"log" // エラーとかを表示するために使う
+	"fmt"
+	"log"
 
-	"gopkg.in/ini.v1" // iniファイルを読み込むためのパッケージを読み込む
+	"gopkg.in/ini.v1"
 )
 
-// サーバーの設定とか、データベースの設定をまとめて入れておく箱を作る
+// 設定を保持する構造体
 type ConfigList struct {
-	Port      string // サーバーのポート番号（例：8080）
-	SQLDriver string // どのデータベースを使うか（例：mysql, sqlite3）
-	DbName    string // データベースの名前（例：sample.db）
-	LogFile   string // ログファイルの場所（例：log/app.log）
+	Port      string
+	SQLDriver string
+	DbUser    string
+	DbPass    string
+	DbHost    string
+	DbPort    string
+	DbName    string
+	LogFile   string
 }
 
-// どこからでも使えるように「設定の箱」を用意しておく
+// グローバルに使える設定変数
 var Config ConfigList
 
-// プログラムが始まったら最初に呼ばれる関数
+// 最初に実行される
 func init() {
-	LoadConfig() // 設定ファイルを読み込んで値を入れる関数を呼び出す
+	LoadConfig()
 	utils.LoggingSettings(Config.LogFile)
 }
 
-// iniファイル（設定ファイル）を読み込んで、値をConfigに入れる関数
+// iniファイルを読み込む
 func LoadConfig() {
 	cfg, err := ini.Load("config.ini")
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	// iniファイルから読み取った値を、Configという箱に入れる
 	Config = ConfigList{
-		Port:      cfg.Section("web").Key("port").MustString("8080"), // webセクションのportキーを探す。なければ8080にする
-		SQLDriver: cfg.Section("db").Key("driver").String(),           // dbセクションのdriverキーの値を取り出す
-		DbName:    cfg.Section("db").Key("name").String(),             // dbセクションのnameキーの値を取り出す
-		LogFile:   cfg.Section("web").Key("logfile").String(),         // webセクションのlogfileキーの値を取り出す
+		Port:      cfg.Section("web").Key("port").MustString("8080"),
+		LogFile:   cfg.Section("web").Key("logfile").MustString("webapp.log"),
+		SQLDriver: cfg.Section("db").Key("driver").String(),
+		DbUser:    cfg.Section("db").Key("user").String(),
+		DbPass:    cfg.Section("db").Key("password").String(),
+		DbHost:    cfg.Section("db").Key("host").MustString("127.0.0.1"),
+		DbPort:    cfg.Section("db").Key("port").MustString("3306"),
+		DbName:    cfg.Section("db").Key("name").String(),
 	}
+}
+
+// MySQL接続文字列を作る便利関数
+func GetMySQLDSN() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&charset=utf8mb4",
+		Config.DbUser,
+		Config.DbPass,
+		Config.DbHost,
+		Config.DbPort,
+		Config.DbName,
+	)
 }

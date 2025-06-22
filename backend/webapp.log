@@ -2,3 +2,13 @@
 2025/06/18 12:29:36 main.go:15: Server started at http://localhost:8080
 2025/06/19 13:34:53 main.go:15: Server started at http://localhost:8080
 2025/06/19 14:00:22 main.go:15: Server started at http://localhost:8080
+2025/06/23 00:29:55 main.go:15: Server started at http://localhost:8080
+2025/06/23 00:32:01 main.go:15: Server started at http://localhost:8080
+2025/06/23 00:34:50 main.go:17: Server started at http://localhost:8080
+2025/06/23 00:36:24 main.go:15: Server started at http://localhost:8080
+2025/06/23 00:37:39 users.go:49: no such table: users
+2025/06/23 00:40:26 main.go:15: Server started at http://localhost:8080
+2025/06/23 00:55:57 main.go:15: Server started at http://localhost:8080
+2025/06/23 00:56:29 main.go:15: Server started at http://localhost:3306
+2025/06/23 00:58:28 main.go:18: Server started at http://localhost:8080
+2025/06/23 01:11:59 main.go:20: Server started at http://localhost:8080

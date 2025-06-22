@@ -1,19 +1,26 @@
 package main
 
 import (
+	"ECoin/config"
 	"ECoin/controllers"
+	"fmt"
 	"log"
 	"net/http"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
-	// ユーザー関連のエンドポイント登録
-	http.HandleFunc("/api/users", controllers.HandleUsers)         // POST, GET (一覧など)
-	http.HandleFunc("/api/users/", controllers.HandleUserByID)     // GET(id), PUT, DELETE
+	// エンドポイント登録
+	http.HandleFunc("/api/users", controllers.HandleUsers)
+	http.HandleFunc("/api/users/", controllers.HandleUserByID)
 
-	// サーバー起動
-	log.Println("Server started at http://localhost:8080")
-	err := http.ListenAndServe(":8080", nil)
+	// サーバー起動ポート
+	addr := fmt.Sprintf(":%s", config.Config.Port)
+	log.Printf("Server started at http://localhost%s\n", addr)
+
+	// サーバー開始
+	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatal("サーバー起動失敗:", err)
 	}
