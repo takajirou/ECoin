@@ -31,7 +31,8 @@ func main() {
 
 	// エンドポイント登録
 	http.HandleFunc("/api/users", controllers.HandleUsers)
-	http.HandleFunc("/api/users/", controllers.HandleUserByID)
+	http.HandleFunc("/api/users/", controllers.HandleUserByUUID)
+	http.HandleFunc("/api/missions", controllers.HandleMissions)
 
 	// サーバー起動ポート
 	addr := fmt.Sprintf(":%s", config.Config.Port)
