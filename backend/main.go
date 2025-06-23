@@ -39,8 +39,8 @@ func main() {
 	log.Printf("Server started at http://localhost%s\n", addr)
 
 	// サーバー開始
-	// err := http.ListenAndServe(addr, nil)
-	// if err != nil {
-	// 	log.Fatal("サーバー起動失敗:", err)
-	// }
+	err := http.ListenAndServe(addr, nil)
+	if err != nil {
+		log.Fatal("サーバー起動失敗:", err)
+	}
 }

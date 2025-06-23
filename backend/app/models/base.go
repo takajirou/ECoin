@@ -64,14 +64,20 @@ func init() {
 	)`, tableNameMission)
 	Db.Exec(cmdM)
 
+	// cmdDropUM := fmt.Sprintf(`DROP TABLE IF EXISTS %s`, tableNameUserMission)
+	// Db.Exec(cmdDropUM)
+
 	cmdUM := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
 		user_id VARCHAR(36),
 		mission_id INT,
-		finished_at DATETIME,
 		proof_image_url VARCHAR(100),
-		period_type ENUM('all', 'week', 'month'),
-		period_value VARCHAR(100),
+
+		// いらなくなったカラム
+		// period_type ENUM('all', 'week', 'month'),
+		// period_value VARCHAR(100),
+
+		finished_at DATE,
 		created_at DATETIME,
 		CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(uuid),
 		CONSTRAINT fk_mission FOREIGN KEY (mission_id) REFERENCES missions(id)
