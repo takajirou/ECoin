@@ -20,7 +20,7 @@ func (um *UserMission) CreateUserMissionByUUID(uuid string, mission_id int) (err
 		mission_id,
 		proof_image_url,
 		finished_at,
-		created_at) values (?, ?, ?, ?, ?, ?, ?)`
+		created_at) values (?, ?, ?, ?, ?)`
 	
 	now := time.Now()
 	finishedDate := now.Format("2006-01-02")

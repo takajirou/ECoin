@@ -54,3 +54,5 @@
 2025/06/23 16:21:35 main.go:39: Server started at http://localhost:8080
 2025/06/23 16:35:10 main.go:39: Server started at http://localhost:8080
 2025/06/23 16:35:28 main.go:39: Server started at http://localhost:8080
+2025/06/23 16:56:06 user_mission.go:37: Error 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`ecoin_db`.`user_mission`, CONSTRAINT `fk_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`uuid`))
+2025/06/23 16:57:49 user_mission.go:37: Error 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`ecoin_db`.`user_mission`, CONSTRAINT `fk_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`uuid`))

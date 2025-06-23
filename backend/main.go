@@ -29,6 +29,7 @@ func main() {
 	// 	log.Println("ミッション作成成功！")
 	// }
 
+
 	// エンドポイント登録
 	http.HandleFunc("/api/users", controllers.HandleUsers)
 	http.HandleFunc("/api/users/", controllers.HandleUserByUUID)
