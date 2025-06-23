@@ -53,14 +53,14 @@ func (u *User) CreateUser() (err error) {
 }
 
 // GetUser 関数：指定したIDのユーザー情報をデータベースから取得し、User構造体として返す
-func GetUser(id int) (user User, err error) {
+func GetUserByUUID(uuid string) (user User, err error) {
 	user = User{} // 空のUser構造体を初期化
 
 	// SQL文：指定されたIDのユーザー情報を全項目取得する
 	cmd := `select id, uuid, name, email, password, coins, pref, city, created_at from users where uuid = ?`
 
 	// SQLを実行し、結果をUser構造体に代入
-	err = Db.QueryRow(cmd, id).Scan(
+	err = Db.QueryRow(cmd, uuid).Scan(
 		&user.ID,
 		&user.UUID,
 		&user.Name,
@@ -77,21 +77,21 @@ func GetUser(id int) (user User, err error) {
 }
 
 
-func (u *User) UpdateUser() (err error){
-	if u.ID == 0 {
-		return errors.New("invalid user ID")
+func (u *User) UpdateUserByUUID() (err error){
+	if u.UUID == "" {
+		return errors.New("invalid UUID")
 	}
-	cmd := `UPDATE users SET name = ?, email = ?, coins = ?, pref = ?, city = ? WHERE id = ?`
-	_, err = Db.Exec(cmd, u.Name, u.Email, u.Coins, u.Pref, u.City, u.ID)
+	cmd := `UPDATE users SET name = ?, email = ?, coins = ?, pref = ?, city = ? WHERE uuid = ?`
+	_, err = Db.Exec(cmd, u.Name, u.Email, u.Coins, u.Pref, u.City, u.UUID)
 	return err
 }
 
-func (u *User) DeleteUser() (err error){
-	cmd := `delete from users where id = ?`
-	_, err = Db.Exec(cmd, u.ID)
-	if  err != nil{
-		log.Fatalln(err)
+func (u *User) DeleteUserByUUID() (err error){
+	if u.UUID == "" {
+		return errors.New("invalid UUID")
 	}
+	cmd := `DELETE FROM users WHERE uuid = ?`
+	_, err = Db.Exec(cmd, u.UUID)
 	return err
 }
 
