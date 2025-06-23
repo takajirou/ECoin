@@ -49,8 +49,7 @@ func (u *User) CreateUser() (err error) {
 		log.Fatalln(err)
 	}
 
-	// エラーがなければnilが返る
-	return err
+	return nil
 }
 
 // GetUser 関数：指定したIDのユーザー情報をデータベースから取得し、User構造体として返す
@@ -58,7 +57,7 @@ func GetUser(id int) (user User, err error) {
 	user = User{} // 空のUser構造体を初期化
 
 	// SQL文：指定されたIDのユーザー情報を全項目取得する
-	cmd := `select id, uuid, name, email, password, created_at from users where id = ?`
+	cmd := `select id, uuid, name, email, password, coins, pref, city, created_at from users where uuid = ?`
 
 	// SQLを実行し、結果をUser構造体に代入
 	err = Db.QueryRow(cmd, id).Scan(

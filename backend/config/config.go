@@ -25,9 +25,9 @@ var Config ConfigList
 
 // 最初に実行される
 func init() {
+	_ = godotenv.Load()
 	LoadEnv()
 	utils.LoggingSettings(Config.LogFile)
-	_ = godotenv.Load()
 }
 
 // 環境変数を読み込む関数
