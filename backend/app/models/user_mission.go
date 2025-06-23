@@ -56,6 +56,3 @@ func GetTodayUserMissionByUUID(uuid string, date string) (user_mission UserMissi
 
 	return user_mission, err
 }
-
-
-
