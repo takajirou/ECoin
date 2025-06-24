@@ -37,7 +37,7 @@ func (ue *UserEvent) CreateUserEvent(uuid string, event_id int) (err error){
 
 func GetUserEventsByUUID(uuid string) (user_event UserEvent, err error){
 	user_event = UserEvent{}
-	cmd := `select id, event_id, user_id, active, requested_at from user_events where uuid = ?`
+	cmd := `select id, event_id, user_id, active, requested_at from user_events where user_id = ?`
 
 	err = Db.QueryRow(cmd,uuid).Scan(
 		&user_event.ID,
