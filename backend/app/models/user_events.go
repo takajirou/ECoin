@@ -19,7 +19,7 @@ func (ue *UserEvent) CreateUserEvent(uuid string, event_id int) (err error){
 		user_id,
 		active,
 		requested_at
-	)`
+	) values (?, ?, ?, ?)`
 
 	_, err = Db.Exec(cmd,
 		event_id,
