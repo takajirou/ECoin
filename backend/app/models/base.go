@@ -39,30 +39,30 @@ func init() {
         log.Fatalln("DB接続エラー:", err)
     }
 
-    // // 外部キー制約を一時的に無効化（MySQLの場合）
-    // Db.Exec("SET FOREIGN_KEY_CHECKS = 0")
+    // 外部キー制約を一時的に無効化（MySQLの場合）
+    Db.Exec("SET FOREIGN_KEY_CHECKS = 0")
 
-    // // すべてのテーブルをDROP（依存関係の逆順）
-    // dropTables := []string{
-    //     tableNameUserEvents,
-    //     tableNameUserRewards,
-    //     tableNameUserMission,
-    //     tableNameScore,
-    //     tableNameEvents,
-    //     tableNameRewards,
-    //     tableNameMission,
-    //     tableNameUser,
-    // }
+    // すべてのテーブルをDROP（依存関係の逆順）
+    dropTables := []string{
+        tableNameUserEvents,
+        tableNameUserRewards,
+        tableNameUserMission,
+        tableNameScore,
+        tableNameEvents,
+        tableNameRewards,
+        tableNameMission,
+        tableNameUser,
+    }
 
-    // for _, tableName := range dropTables {
-    //     cmdDrop := fmt.Sprintf(`DROP TABLE IF EXISTS %s`, tableName)
-    //     if _, err := Db.Exec(cmdDrop); err != nil {
-    //         log.Printf("テーブル削除エラー %s: %v", tableName, err)
-    //     }
-    // }
+    for _, tableName := range dropTables {
+        cmdDrop := fmt.Sprintf(`DROP TABLE IF EXISTS %s`, tableName)
+        if _, err := Db.Exec(cmdDrop); err != nil {
+            log.Printf("テーブル削除エラー %s: %v", tableName, err)
+        }
+    }
 
-    // // 外部キー制約を再有効化
-    // Db.Exec("SET FOREIGN_KEY_CHECKS = 1")
+    // 外部キー制約を再有効化
+    Db.Exec("SET FOREIGN_KEY_CHECKS = 1")
 
 	cmdU := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
@@ -178,7 +178,7 @@ func init() {
 		id INT PRIMARY KEY AUTO_INCREMENT,
 		event_id INT,
 		user_id VARCHAR(36),
-		active BOOLEAN DEFAULT true,
+		active BOOLEAN DEFAULT false,
 		requested_at DATETIME,
 		CONSTRAINT fk_user_events_user FOREIGN KEY (user_id) REFERENCES users(uuid),
 		CONSTRAINT fk_user_events_event FOREIGN KEY (event_id) REFERENCES events(id)

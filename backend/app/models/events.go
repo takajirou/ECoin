@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Events struct {
+type Event struct {
 	ID 				int
 	RequestUser 	string
 	Address 		string
@@ -17,11 +17,11 @@ type Events struct {
 	Point 			int
 	Pref			string
 	City			string
-	capacity 		int
+	Capacity 		int
 	RequestedAt 	time.Time
 }
 
-func (e *Events) CreateEvents(uuid string) (err error) {
+func (e *Event) CreateEvent(uuid string) (err error) {
 	cmd := `insert into events(
 		request_user,
 		address,
@@ -47,7 +47,7 @@ func (e *Events) CreateEvents(uuid string) (err error) {
 		e.Point,
 		e.Pref,
 		e.City,
-		e.capacity,
+		e.Capacity,
 		time.Now(),
 	)
 
@@ -56,4 +56,51 @@ func (e *Events) CreateEvents(uuid string) (err error) {
 	}
 
 	return err
+}
+
+func GetNoneActiveEvents() (event Event, err error){
+	event = Event{}
+
+	cmd := `select id, request_user, title, description, address, active, meeting_time, end_time, point, pref, city, capacity, requested_at from events where active = 0`
+
+	err = Db.QueryRow(cmd).Scan(
+		&event.ID,
+		&event.RequestUser,
+		&event.Title,
+		&event.Description,
+		&event.Address,
+		&event.Active,
+		&event.MeetingTime,
+		&event.EndTime,
+		&event.Point,
+		&event.Pref,
+		&event.City,
+		&event.Capacity,
+		&event.RequestedAt,
+	)
+
+	return event, err
+}
+func GetEventsByEventID(event_id int) (event Event, err error){
+	event = Event{}
+
+	cmd := `select id, request_user, title, description, address, active, meeting_time, end_time, point, pref, city, capacity, requested_at from events where active = 1 and id = ?`
+
+	err = Db.QueryRow(cmd, event_id).Scan(
+		&event.ID,
+		&event.RequestUser,
+		&event.Title,
+		&event.Description,
+		&event.Address,
+		&event.Active,
+		&event.MeetingTime,
+		&event.EndTime,
+		&event.Point,
+		&event.Pref,
+		&event.City,
+		&event.Capacity,
+		&event.RequestedAt,
+	)
+
+	return event, err
 }
