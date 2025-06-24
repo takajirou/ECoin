@@ -6,12 +6,12 @@ import (
 )
 
 type UserMission struct {
-	ID int
-	UserID string
-	MissionID int
-	ProofImageUrl string
-	FinishedAt string
-	CreatedAt time.Time
+	ID 				int
+	UserID 			string
+	MissionID 		int
+	ProofImageUrl 	string
+	FinishedAt 		string
+	CreatedAt 		time.Time
 }
 
 func (um *UserMission) CreateUserMissionByUUID(uuid string, mission_id int) (err error) {
