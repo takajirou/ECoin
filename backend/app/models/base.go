@@ -8,7 +8,7 @@ import (
 	"fmt" // 文字列の整形に使用（SQL文の動的生成）
 	"log" // ログ出力用
 
-	_ "github.com/go-sql-driver/mysql" // SQLiteドライバ。明示的には使わないが、必要なため空インポートする
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 )
 
@@ -35,9 +35,34 @@ const (
 func init() {
 	// データベース接続を開く（configで指定されたドライバ・DB名を使用）
 	Db, err = sql.Open(config.Config.SQLDriver, config.GetMySQLDSN())
-	if err != nil {
-		log.Fatalln("DB接続エラー:", err)
-	}
+    if err != nil {
+        log.Fatalln("DB接続エラー:", err)
+    }
+
+    // // 外部キー制約を一時的に無効化（MySQLの場合）
+    // Db.Exec("SET FOREIGN_KEY_CHECKS = 0")
+
+    // // すべてのテーブルをDROP（依存関係の逆順）
+    // dropTables := []string{
+    //     tableNameUserEvents,
+    //     tableNameUserRewards,
+    //     tableNameUserMission,
+    //     tableNameScore,
+    //     tableNameEvents,
+    //     tableNameRewards,
+    //     tableNameMission,
+    //     tableNameUser,
+    // }
+
+    // for _, tableName := range dropTables {
+    //     cmdDrop := fmt.Sprintf(`DROP TABLE IF EXISTS %s`, tableName)
+    //     if _, err := Db.Exec(cmdDrop); err != nil {
+    //         log.Printf("テーブル削除エラー %s: %v", tableName, err)
+    //     }
+    // }
+
+    // // 外部キー制約を再有効化
+    // Db.Exec("SET FOREIGN_KEY_CHECKS = 1")
 
 	cmdU := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
@@ -48,9 +73,13 @@ func init() {
 		coins INT DEFAULT 0,
 		pref VARCHAR(100),
 		city VARCHAR(100),
+		admin BOOLEAN DEFAULT false,
 		created_at DATETIME
 	)`, tableNameUser)
-	Db.Exec(cmdU)
+	_, err = Db.Exec(cmdU)
+	if err != nil {
+		log.Fatalf("usersテーブル作成エラー: %v", err)
+	}
 
 	cmdM := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
@@ -58,31 +87,29 @@ func init() {
 		description TEXT,
 		difficulty ENUM('easy', 'normal', 'hard'),
 		point INT,
-		require_proof boolean DEFAULT false,
-		active boolean DEFAULT true,
+		require_proof BOOLEAN DEFAULT false,
+		active BOOLEAN DEFAULT true,
 		created_at DATETIME
 	)`, tableNameMission)
-	Db.Exec(cmdM)
-
-	// cmdDropUM := fmt.Sprintf(`DROP TABLE IF EXISTS %s`, tableNameUserMission)
-	// Db.Exec(cmdDropUM)
+	_, err = Db.Exec(cmdM)
+	if err != nil {
+		log.Fatalf("missionテーブル作成エラー: %v", err)
+	}
 
 	cmdUM := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
 		user_id VARCHAR(36),
 		mission_id INT,
 		proof_image_url VARCHAR(100),
-
-		// いらなくなったカラム
-		// period_type ENUM('all', 'week', 'month'),
-		// period_value VARCHAR(100),
-
 		finished_at DATE,
 		created_at DATETIME,
 		CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(uuid),
 		CONSTRAINT fk_mission FOREIGN KEY (mission_id) REFERENCES missions(id)
 	)`, tableNameUserMission)
-	Db.Exec(cmdUM)
+	_, err = Db.Exec(cmdUM)
+	if err != nil {
+		log.Fatalf("user_missionテーブル作成エラー: %v", err)
+	}
 
 	cmdS := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
@@ -93,15 +120,23 @@ func init() {
 		created_at DATETIME,
 		CONSTRAINT fk_score_user FOREIGN KEY (user_id) REFERENCES users(uuid)
 	)`, tableNameScore)
-	Db.Exec(cmdS)
+	_, err = Db.Exec(cmdS)
+	if err != nil {
+		log.Fatalf("scoreテーブル作成エラー: %v", err)
+	}
 
 	cmdR := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
 		name VARCHAR(100),
 		description TEXT,
-		required_points INT
+		required_points INT,
+		active BOOLEAN DEFAULT true,
+		created_at DATETIME
 	)`, tableNameRewards)
-	Db.Exec(cmdR)
+	_, err = Db.Exec(cmdR)
+	if err != nil {
+		log.Fatalf("rewardテーブル作成エラー: %v", err)
+	}
 
 	cmdUR := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
@@ -111,23 +146,33 @@ func init() {
 		CONSTRAINT fk_rewards_user FOREIGN KEY (user_id) REFERENCES users(uuid),
 		CONSTRAINT fk_reward FOREIGN KEY (reward_id) REFERENCES rewards(id)
 	)`, tableNameUserRewards)
-	Db.Exec(cmdUR)
+	_, err = Db.Exec(cmdUR)
+	if err != nil {
+		log.Fatalf("user_rewardテーブル作成エラー: %v", err)
+	}
 
+	cmdDropE := fmt.Sprintf(`DROP TABLE IF EXISTS %s`, tableNameEvents)
+	Db.Exec(cmdDropE)
 	cmdE := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
 		request_user VARCHAR(36),
-		venue VARCHAR(255),
 		title VARCHAR(100),
 		description TEXT,
+		address VARCHAR(255),
 		active BOOLEAN DEFAULT false,
-		meeting_time DATETIME,
-		end_time DATETIME,
+		meeting_time DATE,
+		end_time DATE,
 		point INT,
+		pref VARCHAR(100),
+		city VARCHAR(100),
 		capacity INT,
 		requested_at DATETIME,
 		CONSTRAINT fk_event_user FOREIGN KEY (request_user) REFERENCES users(uuid)
 	)`, tableNameEvents)
-	Db.Exec(cmdE)
+	_, err = Db.Exec(cmdE)
+	if err != nil {
+		log.Fatalf("eventテーブル作成エラー: %v", err)
+	}
 
 	cmdUE := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
@@ -138,14 +183,20 @@ func init() {
 		CONSTRAINT fk_user_events_user FOREIGN KEY (user_id) REFERENCES users(uuid),
 		CONSTRAINT fk_user_events_event FOREIGN KEY (event_id) REFERENCES events(id)
 	)`, tableNameUserEvents)
-	Db.Exec(cmdUE)
+	_, err = Db.Exec(cmdUE)
+	if err != nil {
+		log.Fatalf("user_eventテーブル作成エラー: %v", err)
+	}
 
 }
-
-func createUUID() (uuidobj uuid.UUID){
-	uuidobj, _ = uuid.NewUUID()
-	return uuidobj
+func createUUID() uuid.UUID {
+    uuidobj, err := uuid.NewUUID()
+    if err != nil {
+        log.Fatalf("UUID生成エラー: %v", err)
+    }
+    return uuidobj
 }
+
 
 func Encrypt(pw string) string {
 	hash := sha256.Sum256([]byte(pw))

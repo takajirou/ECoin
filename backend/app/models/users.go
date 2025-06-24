@@ -6,17 +6,17 @@ import (
 	"time" // 日時の取得・管理に使用
 )
 
-// User構造体：ユーザー情報を表すデータモデル
 type User struct {
-	ID        int       // ユーザーID（自動採番）
-	UUID      string    // ユーザーごとのユニークな識別子
-	Name      string    // ユーザー名
-	Email     string    // メールアドレス
-	Password  string    // パスワード（ハッシュ化前）
-	Coins 	  int		// 所持コイン
-	Pref      string    // 住んでる県
-	City   	  string	// 住んでる市
-	CreatedAt time.Time // ユーザー登録日時
+	ID        int
+	UUID      string
+	Name      string
+	Email     string
+	Password  string
+	Coins 	  int
+	Pref      string
+	City   	  string
+	Admin	  bool
+	CreatedAt time.Time
 }
 
 func (u *User) CreateUser() (err error) {
@@ -30,7 +30,8 @@ func (u *User) CreateUser() (err error) {
 		coins,
 		pref,
 		city,
-		created_at) values (?, ?, ?, ?, ?, ?, ?, ?)`
+		admin,
+		created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	
 	// SQL実行
 	_, err = Db.Exec(cmd,
@@ -41,6 +42,7 @@ func (u *User) CreateUser() (err error) {
 		u.Coins,
 		u.Pref,
 		u.City,
+		u.Admin,
 		time.Now(),
 	)
 
@@ -69,6 +71,7 @@ func GetUserByUUID(uuid string) (user User, err error) {
 		&user.Coins,
 		&user.Pref,
 		&user.City,
+		&user.Admin,
 		&user.CreatedAt,
 	)
 
@@ -81,8 +84,8 @@ func (u *User) UpdateUserByUUID() (err error){
 	if u.UUID == "" {
 		return errors.New("invalid UUID")
 	}
-	cmd := `UPDATE users SET name = ?, email = ?, coins = ?, pref = ?, city = ? WHERE uuid = ?`
-	_, err = Db.Exec(cmd, u.Name, u.Email, u.Coins, u.Pref, u.City, u.UUID)
+	cmd := `UPDATE users SET name = ?, email = ?, coins = ?, pref = ?, city = ?, admin = ? WHERE uuid = ?`
+	_, err = Db.Exec(cmd, u.Name, u.Email, u.Coins, u.Pref, u.City, u.UUID, u.Admin)
 	return err
 }
 
@@ -98,7 +101,7 @@ func (u *User) DeleteUserByUUID() (err error){
 // GetAllUsers 関数：全ユーザー情報をデータベースから取得してスライスで返す
 func GetAllUsers() ([]User, error) {
 	// SQL文：全ユーザーの情報を取得
-	rows, err := Db.Query(`SELECT id, uuid, name, email, password, created_at, coins, pref, city FROM users`)
+	rows, err := Db.Query(`SELECT id, uuid, name, email, password, coins, pref, city, admin, created_at  FROM users`)
 	if err != nil {
 		return nil, err // エラーがあればnilとエラーを返す
 	}
@@ -114,10 +117,11 @@ func GetAllUsers() ([]User, error) {
 			&u.Name,
 			&u.Email,
 			&u.Password,
-			&u.CreatedAt,
 			&u.Coins,
 			&u.Pref,
 			&u.City,
+			&u.Admin,
+			&u.CreatedAt,
 		)
 		if err != nil {
 			return nil, err
