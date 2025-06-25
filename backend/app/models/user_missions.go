@@ -40,7 +40,7 @@ func (um *UserMission) CreateUserMissionByUUID(uuid string, mission_id int) (err
 	return err
 }
 
-func GetTodayUserMissionByUUID(uuid string, date string) (user_mission UserMission, err error){
+func GetTodayUserMissionByUUID(uuid string) (user_mission UserMission, err error){
 	user_mission = UserMission{}
 
 	cmd := `select id, user_id, mission_id, proof_image_url, finished_at, created_at from user_mission where user_id = ? and finished_at = CURDATE()`
