@@ -1,58 +1,85 @@
 package models
 
 import (
-	"log"
 	"time"
 )
 
-type UserMission struct {
-	ID 				int
-	UserID 			string
-	MissionID 		int
-	ProofImageUrl 	string
-	FinishedAt 		string
-	CreatedAt 		time.Time
+type MissionStats struct {
+	ID          int
+	UserID      string
+	MissionID   int
+	ClearCount  int
+	PeriodType  string
+	PeriodValue string
+	UpdatedAt   time.Time
 }
 
-func (um *UserMission) CreateUserMissionByUUID(uuid string, mission_id int) (err error) {
-	cmd := `insert into user_mission(
-		user_id,
-		mission_id,
-		proof_image_url,
-		finished_at,
-		created_at) values (?, ?, ?, ?, ?)`
-	
-	now := time.Now()
-	finishedDate := now.Format("2006-01-02")
-
-	_, err = Db.Exec(cmd,
-		uuid,
-		mission_id,
-		um.ProofImageUrl,
-		finishedDate,
-		time.Now(),
-	)
-
-	if err != nil {
-		log.Fatalln(err)
+func UpsertMissionStatsAllPeriods(userID string, missionID int) error {
+	periods := []struct {
+		periodType  string
+		periodValue string
+	}{
+		{"week", GetCurrentYearWeek()},
+		{"month", GetCurrentYearMonth()},
+		{"total", "total"},
 	}
 
+	for _, p := range periods {
+		err := UpsertMissionStats(userID, missionID, p.periodType, p.periodValue)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func UpsertMissionStats(userID string, missionID int, periodType, periodValue string) error {
+	cmd := `
+		INSERT INTO mission_stats (
+			user_id, mission_id, clear_count, period_type, period_value, updated_at
+		) VALUES (?, ?, 1, ?, ?, NOW())
+		ON DUPLICATE KEY UPDATE
+			clear_count = clear_count + 1,
+			updated_at = NOW();`
+
+	_, err := Db.Exec(cmd, userID, missionID, periodType, periodValue)
 	return err
 }
 
-func GetTodayUserMissionByUUID(uuid string) (user_mission UserMission, err error){
-	user_mission = UserMission{}
+// 当日のミッション達成状況
+func GetTodayUserMissionByUUID(uuid string) (mission_stats MissionStats, err error){
+	mission_stats = MissionStats{}
 
-	cmd := `select id, user_id, mission_id, proof_image_url, finished_at, created_at from user_mission where user_id = ? and finished_at = CURDATE()`
+	cmd := `select id, user_id, mission_id, clear_count, period_type, period_value, updated_at from mission_stats where user_id = ? and updated_at = CURDATE()`
 
 	err = Db.QueryRow(cmd, uuid).Scan(
-		&user_mission.ID,
-		&user_mission.UserID,
-		&user_mission.MissionID,
-		&user_mission.ProofImageUrl,
-		&user_mission.FinishedAt,
-		&user_mission.CreatedAt,
+		&mission_stats.ID,
+		&mission_stats.UserID,
+		&mission_stats.MissionID,
+		&mission_stats.ClearCount,
+		&mission_stats.PeriodType,
+		&mission_stats.PeriodValue,
+		&mission_stats.UpdatedAt,
 	)
 
-	return user_mission, err
+	return mission_stats, err
+}
+
+// 統計用 週/月毎に取得
+func GetTodayMissionStatsByPeriod(uuid string, period_type string, period_value string) (mission_stats MissionStats, err error){
+	mission_stats = MissionStats{}
+
+	cmd := `select id, user_id, mission_id, clear_count, period_type, period_value, updated_at from mission_stats where user_id = ? and period_type = ? and period_value = ?`
+	err = Db.QueryRow(cmd, uuid, period_type, period_value).Scan(
+		&mission_stats.ID,
+		&mission_stats.UserID,
+		&mission_stats.MissionID,
+		&mission_stats.ClearCount,
+		&mission_stats.PeriodType,
+		&mission_stats.PeriodValue,
+		&mission_stats.UpdatedAt,
+	)
+
+
+	return mission_stats, err
 }

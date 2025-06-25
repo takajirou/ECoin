@@ -65,3 +65,6 @@
 2025/06/25 01:40:56 main.go:40: Server started at http://localhost:8080
 2025/06/25 02:06:30 main.go:40: Server started at http://localhost:8080
 2025/06/25 02:18:39 main.go:40: Server started at http://localhost:8080
+2025/06/26 01:37:13 base.go:113: user_missionテーブル作成エラー: Error 1826 (HY000): Duplicate foreign key constraint name 'fk_user'
+2025/06/26 01:39:22 base.go:140: user_rewardテーブル作成エラー: Error 1824 (HY000): Failed to open the referenced table 'rewards'
+2025/06/26 01:41:03 main.go:44: Server started at http://localhost:8080

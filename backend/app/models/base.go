@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"fmt" // 文字列の整形に使用（SQL文の動的生成）
 	"log" // ログ出力用
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
@@ -20,14 +21,14 @@ var err error
 
 // 使用するユーザーテーブル名を定数で定義
 const (
-	tableNameUser    	 = "users"
-	tableNameMission 	 = "missions"
-	tableNameUserMission = "user_mission"
-	tableNameScore 		 = "score"
-	tableNameRewards	 = "rewards"
-	tableNameUserRewards = "user_rewards"
-	tableNameEvents      = "events"
-	tableNameUserEvents  = "user_events"
+	tableNameUser    	 	= "users"
+	tableNameMission 		= "missions"
+	tableNameMissionStats 	= "mission_stats"
+	tableNameScore 		 	= "score"
+	tableNameRewards	 	= "rewards"
+	tableNameUserRewards 	= "user_rewards"
+	tableNameEvents      	= "events"
+	tableNameUserEvents  	= "user_events"
 )
 
 
@@ -46,7 +47,7 @@ func init() {
     dropTables := []string{
         tableNameUserEvents,
         tableNameUserRewards,
-        tableNameUserMission,
+        tableNameMissionStats,
         tableNameScore,
         tableNameEvents,
         tableNameRewards,
@@ -96,17 +97,18 @@ func init() {
 		log.Fatalf("missionテーブル作成エラー: %v", err)
 	}
 
-	cmdUM := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
-		id INT PRIMARY KEY AUTO_INCREMENT,
-		user_id VARCHAR(36),
-		mission_id INT,
-		proof_image_url VARCHAR(100),
-		finished_at DATE,
-		created_at DATETIME,
-		CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(uuid),
-		CONSTRAINT fk_mission FOREIGN KEY (mission_id) REFERENCES missions(id)
-	)`, tableNameUserMission)
-	_, err = Db.Exec(cmdUM)
+	cmdMS := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		user_id VARCHAR(255) NOT NULL,
+		mission_id INT NOT NULL,
+		clear_count INT NOT NULL DEFAULT 0,
+		period_type ENUM('week', 'month', 'total') NOT NULL,
+		period_value VARCHAR(10) NOT NULL,
+		updated_at DATETIME NOT NULL,
+		FOREIGN KEY (user_id) REFERENCES users(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
+		FOREIGN KEY (mission_id) REFERENCES missions(id) ON DELETE CASCADE ON UPDATE CASCADE
+	)`, tableNameMissionStats)
+	_, err = Db.Exec(cmdMS)
 	if err != nil {
 		log.Fatalf("user_missionテーブル作成エラー: %v", err)
 	}
@@ -115,10 +117,10 @@ func init() {
 		id INT PRIMARY KEY AUTO_INCREMENT,
 		user_id VARCHAR(36),
 		earn_coin INT,
-		period_type ENUM('all', 'week', 'month'),
+		period_type ENUM('week', 'month'),
 		period_value VARCHAR(100),
 		created_at DATETIME,
-		CONSTRAINT fk_score_user FOREIGN KEY (user_id) REFERENCES users(uuid)
+		FOREIGN KEY (user_id) REFERENCES users(uuid)
 	)`, tableNameScore)
 	_, err = Db.Exec(cmdS)
 	if err != nil {
@@ -138,21 +140,21 @@ func init() {
 		log.Fatalf("rewardテーブル作成エラー: %v", err)
 	}
 
+
 	cmdUR := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
 		user_id VARCHAR(36),
 		reward_id INT,
 		exchanged_at DATETIME,
-		CONSTRAINT fk_rewards_user FOREIGN KEY (user_id) REFERENCES users(uuid),
-		CONSTRAINT fk_reward FOREIGN KEY (reward_id) REFERENCES rewards(id)
+		FOREIGN KEY (user_id) REFERENCES users(uuid),
+		FOREIGN KEY (reward_id) REFERENCES rewards(id)
 	)`, tableNameUserRewards)
 	_, err = Db.Exec(cmdUR)
 	if err != nil {
 		log.Fatalf("user_rewardテーブル作成エラー: %v", err)
 	}
+	
 
-	cmdDropE := fmt.Sprintf(`DROP TABLE IF EXISTS %s`, tableNameEvents)
-	Db.Exec(cmdDropE)
 	cmdE := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
 		request_user VARCHAR(36),
@@ -167,7 +169,7 @@ func init() {
 		city VARCHAR(100),
 		capacity INT,
 		requested_at DATETIME,
-		CONSTRAINT fk_event_user FOREIGN KEY (request_user) REFERENCES users(uuid)
+		FOREIGN KEY (request_user) REFERENCES users(uuid)
 	)`, tableNameEvents)
 	_, err = Db.Exec(cmdE)
 	if err != nil {
@@ -180,8 +182,8 @@ func init() {
 		user_id VARCHAR(36),
 		active BOOLEAN DEFAULT false,
 		requested_at DATETIME,
-		CONSTRAINT fk_user_events_user FOREIGN KEY (user_id) REFERENCES users(uuid),
-		CONSTRAINT fk_user_events_event FOREIGN KEY (event_id) REFERENCES events(id)
+		FOREIGN KEY (user_id) REFERENCES users(uuid),
+		FOREIGN KEY (event_id) REFERENCES events(id)
 	)`, tableNameUserEvents)
 	_, err = Db.Exec(cmdUE)
 	if err != nil {
@@ -197,8 +199,18 @@ func createUUID() uuid.UUID {
     return uuidobj
 }
 
-
 func Encrypt(pw string) string {
 	hash := sha256.Sum256([]byte(pw))
 	return hex.EncodeToString(hash[:])
+}
+
+func GetCurrentYearWeek() string {
+	now := time.Now()
+	year, week := now.ISOWeek()
+	return fmt.Sprintf("%d-%02d", year, week)
+}
+
+func GetCurrentYearMonth() string {
+	now := time.Now()
+	return fmt.Sprintf("%d-%02d", now.Year(), int(now.Month()))
 }
