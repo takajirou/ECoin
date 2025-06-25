@@ -36,8 +36,7 @@ func main() {
 	http.HandleFunc("/api/users/", controllers.HandleUserByUUID)
 	http.HandleFunc("/api/missions", controllers.HandleMissions)
 	http.HandleFunc("/api/missions/", controllers.HandleUserMissions)
-	// http.HandleFunc("/api/scores/", controllers.HandleScoreFilter)
-	// http.HandleFunc("/api/scores", controllers.HandleScoreAll)
+	http.HandleFunc("/api/user/score/", controllers.HandleUserScore)
 
 	// サーバー起動ポート
 	addr := fmt.Sprintf(":%s", config.Config.Port)

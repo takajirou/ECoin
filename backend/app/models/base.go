@@ -106,11 +106,12 @@ func init() {
 		period_value VARCHAR(10) NOT NULL,
 		updated_at DATETIME NOT NULL,
 		FOREIGN KEY (user_id) REFERENCES users(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
-		FOREIGN KEY (mission_id) REFERENCES missions(id) ON DELETE CASCADE ON UPDATE CASCADE
+		FOREIGN KEY (mission_id) REFERENCES missions(id) ON DELETE CASCADE ON UPDATE CASCADE,
+		UNIQUE KEY unique_user_mission_period (user_id, mission_id, period_type, period_value)
 	)`, tableNameMissionStats)
 	_, err = Db.Exec(cmdMS)
 	if err != nil {
-		log.Fatalf("user_missionテーブル作成エラー: %v", err)
+		log.Fatalf("mission_statsテーブル作成エラー: %v", err)
 	}
 
 	cmdS := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
@@ -120,7 +121,8 @@ func init() {
 		period_type ENUM('week', 'month'),
 		period_value VARCHAR(100),
 		created_at DATETIME,
-		FOREIGN KEY (user_id) REFERENCES users(uuid)
+		FOREIGN KEY (user_id) REFERENCES users(uuid),
+		UNIQUE KEY unique_user_period (user_id, period_type, period_value)
 	)`, tableNameScore)
 	_, err = Db.Exec(cmdS)
 	if err != nil {
@@ -140,7 +142,6 @@ func init() {
 		log.Fatalf("rewardテーブル作成エラー: %v", err)
 	}
 
-
 	cmdUR := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
 		user_id VARCHAR(36),
@@ -153,7 +154,6 @@ func init() {
 	if err != nil {
 		log.Fatalf("user_rewardテーブル作成エラー: %v", err)
 	}
-	
 
 	cmdE := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
