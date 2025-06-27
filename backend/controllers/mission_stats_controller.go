@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func HandleUserMissions(w http.ResponseWriter, r *http.Request) {
+func HandleMissionStats(w http.ResponseWriter, r *http.Request) {
 	uuid := strings.Split(r.URL.Path, "/")[3]
 	missionIDStr := strings.Split(r.URL.Path, "/")[4]
 	missionID, err := strconv.Atoi(missionIDStr)

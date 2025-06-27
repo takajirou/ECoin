@@ -35,7 +35,7 @@ func main() {
 	http.HandleFunc("/api/users", controllers.HandleUsers)
 	http.HandleFunc("/api/users/", controllers.HandleUserByUUID)
 	http.HandleFunc("/api/missions", controllers.HandleMissions)
-	http.HandleFunc("/api/missions/", controllers.HandleUserMissions)
+	http.HandleFunc("/api/missions/", controllers.HandleMissionStats)
 	http.HandleFunc("/api/user/score/", controllers.HandleUserScore)
 
 	// サーバー起動ポート
