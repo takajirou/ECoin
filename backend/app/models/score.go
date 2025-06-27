@@ -29,7 +29,6 @@ func GetScoreByUserPeriod(userID, periodType, periodValue string) (Score, error)
 
 // アップサート（存在すれば更新、なければ挿入）
 func (s *Score) UpsertScore() error {
-	// 事前にDBで (user_id, period_type, period_value) にユニーク制約をつけておく必要があります
 	cmd := `
 	INSERT INTO score (user_id, earn_coin, period_type, period_value, created_at)
 	VALUES (?, ?, ?, ?, NOW())

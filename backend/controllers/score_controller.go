@@ -7,8 +7,7 @@ import (
 	"strings"
 )
 
-// 該当データがあれば更新、なければ作成（アップサート）を行うAPIの例
-
+// 該当データがあれば更新、なければ作成（アップサート）を行うA
 func HandleUserScore(w http.ResponseWriter, r *http.Request) {
 	// URLパスから userID を取得（例: /api/user/score/{userID}）
 	parts := strings.Split(r.URL.Path, "/")
@@ -27,7 +26,7 @@ func HandleUserScore(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// userID はURLパスのものを利用。body内の userID は無視してもOK
+		// userID はURLパスのものを利用
 		s.UserID = userID
 
 		// アップサート処理
