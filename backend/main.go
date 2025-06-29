@@ -41,6 +41,7 @@ func main() {
 	http.Handle("/api/me", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMe)))
 	http.Handle("/api/profile", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMyProfile)))
 	http.Handle("/api/status", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMissionStats)))
+
 	// 管理者権限が必要なエンドポイント
 	http.Handle("/api/admin/users", 
 	middleware.JWTMiddleware(

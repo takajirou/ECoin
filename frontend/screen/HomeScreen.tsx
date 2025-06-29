@@ -7,10 +7,11 @@ type RootStackParamList = {
     Home: undefined;
     Detail: undefined;
     SignUp: undefined;
+    Login: undefined;
 };
 
 type HomeScreenProps = {
-    navigation: NativeStackNavigationProp<RootStackParamList, "Home" | "SignUp">;
+    navigation: NativeStackNavigationProp<RootStackParamList, "Home" | "SignUp" | "Login">;
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
@@ -18,6 +19,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Layout>
             <Text>ホーム画面</Text>
             <Button title="新規登録" onPress={() => navigation.navigate("SignUp")} />
+            <Button title="ログイン" onPress={() => navigation.navigate("Login")} />
             <Button title="詳細へ" onPress={() => navigation.navigate("Detail")} />
         </Layout>
     );

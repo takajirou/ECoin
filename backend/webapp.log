@@ -69,3 +69,4 @@
 2025/06/26 01:39:22 base.go:140: user_rewardテーブル作成エラー: Error 1824 (HY000): Failed to open the referenced table 'rewards'
 2025/06/26 01:41:03 main.go:44: Server started at http://localhost:8080
 2025/06/26 01:49:58 main.go:44: Server started at http://localhost:8080
+2025/06/29 15:39:30 main.go:63: Server started at http://localhost:8080
