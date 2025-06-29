@@ -11,6 +11,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // グローバル変数としてデータベース接続用のポインタを定義する
@@ -213,4 +214,15 @@ func GetCurrentYearWeek() string {
 func GetCurrentYearMonth() string {
 	now := time.Now()
 	return fmt.Sprintf("%d-%02d", now.Year(), int(now.Month()))
+}
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+// パスワード検証
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }

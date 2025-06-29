@@ -2,43 +2,59 @@ package models
 
 import (
 	"errors"
-	"log"  // ログ出力用（エラー時に使用）
-	"time" // 日時の取得・管理に使用
+	"log"
+	"time"
 )
 
 type User struct {
-	ID        int
-	UUID      string
-	Name      string
-	Email     string
-	Password  string
-	Coins 	  int
-	Pref      string
-	City   	  string
-	Admin	  bool
-	CreatedAt time.Time
+	ID        int       `json:"id"`
+	UUID      string    `json:"uuid"`
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password,omitempty"`
+	Coins     int       `json:"coins"`
+	Pref      string    `json:"pref"`
+	City      string    `json:"city"`
+	Admin     bool      `json:"admin"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
-func (u *User) CreateUser() (err error) {
-	// ユーザー情報を挿入するSQL文（? はプレースホルダ）
-	
-	cmd := `insert into users(
-		uuid,
-		name,
-		email,
-		password,
-		coins,
-		pref,
-		city,
-		admin,
-		created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-	
-	// SQL実行
+// ログイン用の構造体
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginResponse struct {
+	Token string   `json:"token"`
+	User  UserInfo `json:"user"`
+}
+
+type UserInfo struct {
+	ID    int    `json:"id"`
+	UUID  string `json:"uuid"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Admin bool   `json:"admin"`
+}
+
+// ユーザー作成
+func (u *User) CreateUser() error {
+	// パスワードをハッシュ化
+	hashedPassword, err := HashPassword(u.Password)
+	if err != nil {
+		return err
+	}
+
+	cmd := `INSERT INTO users(
+		uuid, name, email, password, coins, pref, city, admin, created_at
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+
 	_, err = Db.Exec(cmd,
 		createUUID(),
 		u.Name,
 		u.Email,
-		Encrypt(u.Password),
+		hashedPassword,
 		u.Coins,
 		u.Pref,
 		u.City,
@@ -46,23 +62,21 @@ func (u *User) CreateUser() (err error) {
 		time.Now(),
 	)
 
-	// エラー処理
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("CreateUser error: %v", err)
+		return err
 	}
 
 	return nil
 }
 
-// GetUser 関数：指定したIDのユーザー情報をデータベースから取得し、User構造体として返す
-func GetUserByUUID(uuid string) (user User, err error) {
-	user = User{} // 空のUser構造体を初期化
+// UUIDでユーザー取得
+func GetUserByUUID(uuid string) (User, error) {
+	user := User{}
+	cmd := `SELECT id, uuid, name, email, password, coins, pref, city, admin, created_at 
+			FROM users WHERE uuid = ?`
 
-	// SQL文：指定されたIDのユーザー情報を全項目取得する
-	cmd := `select id, uuid, name, email, password, coins, pref, city, created_at from users where uuid = ?`
-
-	// SQLを実行し、結果をUser構造体に代入
-	err = Db.QueryRow(cmd, uuid).Scan(
+	err := Db.QueryRow(cmd, uuid).Scan(
 		&user.ID,
 		&user.UUID,
 		&user.Name,
@@ -75,40 +89,64 @@ func GetUserByUUID(uuid string) (user User, err error) {
 		&user.CreatedAt,
 	)
 
-	// 構造体（user）とエラー（err）を返す
 	return user, err
 }
 
+// メールアドレスでユーザー取得
+func GetUserByEmail(email string) (User, error) {
+	user := User{}
+	cmd := `SELECT id, uuid, name, email, password, coins, pref, city, admin, created_at 
+			FROM users WHERE email = ?`
 
-func (u *User) UpdateUserByUUID() (err error){
+	err := Db.QueryRow(cmd, email).Scan(
+		&user.ID,
+		&user.UUID,
+		&user.Name,
+		&user.Email,
+		&user.Password,
+		&user.Coins,
+		&user.Pref,
+		&user.City,
+		&user.Admin,
+		&user.CreatedAt,
+	)
+
+	return user, err
+}
+
+// ユーザー更新
+func (u *User) UpdateUserByUUID() error {
 	if u.UUID == "" {
 		return errors.New("invalid UUID")
 	}
-	cmd := `UPDATE users SET name = ?, email = ?, coins = ?, pref = ?, city = ?, admin = ? WHERE uuid = ?`
-	_, err = Db.Exec(cmd, u.Name, u.Email, u.Coins, u.Pref, u.City, u.UUID, u.Admin)
+
+	cmd := `UPDATE users SET name = ?, email = ?, coins = ?, pref = ?, city = ?, admin = ? 
+			WHERE uuid = ?`
+
+	_, err := Db.Exec(cmd, u.Name, u.Email, u.Coins, u.Pref, u.City, u.Admin, u.UUID)
 	return err
 }
 
-func (u *User) DeleteUserByUUID() (err error){
+// ユーザー削除
+func (u *User) DeleteUserByUUID() error {
 	if u.UUID == "" {
 		return errors.New("invalid UUID")
 	}
+
 	cmd := `DELETE FROM users WHERE uuid = ?`
-	_, err = Db.Exec(cmd, u.UUID)
+	_, err := Db.Exec(cmd, u.UUID)
 	return err
 }
 
-// GetAllUsers 関数：全ユーザー情報をデータベースから取得してスライスで返す
+// 全ユーザー取得
 func GetAllUsers() ([]User, error) {
-	// SQL文：全ユーザーの情報を取得
-	rows, err := Db.Query(`SELECT id, uuid, name, email, password, coins, pref, city, admin, created_at  FROM users`)
+	rows, err := Db.Query(`SELECT id, uuid, name, email, password, coins, pref, city, admin, created_at FROM users`)
 	if err != nil {
-		return nil, err // エラーがあればnilとエラーを返す
+		return nil, err
 	}
-	defer rows.Close() // 処理が終わったらクローズ
+	defer rows.Close()
 
-	var users []User // 結果を格納するスライス
-
+	var users []User
 	for rows.Next() {
 		var u User
 		err := rows.Scan(
@@ -126,7 +164,22 @@ func GetAllUsers() ([]User, error) {
 		if err != nil {
 			return nil, err
 		}
-		users = append(users, u) // 取得したユーザーをスライスに追加
+		users = append(users, u)
 	}
 	return users, nil
+}
+
+// ログイン認証
+func (u *User) Authenticate(email, password string) error {
+	user, err := GetUserByEmail(email)
+	if err != nil {
+		return errors.New("ユーザーが見つかりません")
+	}
+
+	if !CheckPasswordHash(password, user.Password) {
+		return errors.New("パスワードが間違っています")
+	}
+
+	*u = user
+	return nil
 }

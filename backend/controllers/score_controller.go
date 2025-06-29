@@ -2,62 +2,61 @@ package controllers
 
 import (
 	"ECoin/app/models"
+	"ECoin/middleware"
+	"ECoin/utils"
 	"encoding/json"
 	"net/http"
-	"strings"
 )
 
-// 該当データがあれば更新、なければ作成（アップサート）を行うA
 func HandleUserScore(w http.ResponseWriter, r *http.Request) {
-	// URLパスから userID を取得（例: /api/user/score/{userID}）
-	parts := strings.Split(r.URL.Path, "/")
-	if len(parts) < 5 {
-		http.Error(w, "invalid URL", http.StatusBadRequest)
+	// JWTからユーザー情報を取得
+	claims, ok := r.Context().Value(middleware.UserContextKey).(*utils.Claims)
+	if !ok {
+		http.Error(w, "認証情報の取得に失敗しました", http.StatusUnauthorized)
 		return
 	}
-	userID := parts[4]
+	userID := claims.UUID
 
 	switch r.Method {
 	case http.MethodPost:
 		var s models.Score
 		err := json.NewDecoder(r.Body).Decode(&s)
 		if err != nil {
-			http.Error(w, "invalid request body", http.StatusBadRequest)
+			http.Error(w, "無効なリクエストボディです", http.StatusBadRequest)
 			return
 		}
 
-		// userID はURLパスのものを利用
+		// トークンから取得したユーザーIDを使用
 		s.UserID = userID
 
-		// アップサート処理
 		err = s.UpsertScore()
 		if err != nil {
-			http.Error(w, "failed to upsert score", http.StatusInternalServerError)
+			http.Error(w, "スコアの更新に失敗しました", http.StatusInternalServerError)
 			return
 		}
 
-		json.NewEncoder(w).Encode(map[string]string{"message": "score updated or created"})
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"message": "スコアを更新または作成しました"})
 
 	case http.MethodGet:
-		// GETならクエリパラメータから periodType, periodValue を取得して該当スコアを返す
-		query := r.URL.Query()
-		periodType := query.Get("period_type")
-		periodValue := query.Get("period_value")
+		periodType := r.URL.Query().Get("period_type")
+		periodValue := r.URL.Query().Get("period_value")
 
 		if periodType == "" || periodValue == "" {
-			http.Error(w, "period_type and period_value are required", http.StatusBadRequest)
+			http.Error(w, "period_type と period_value は必須です", http.StatusBadRequest)
 			return
 		}
 
 		score, err := models.GetScoreByUserPeriod(userID, periodType, periodValue)
 		if err != nil {
-			http.Error(w, "score not found", http.StatusNotFound)
+			http.Error(w, "スコアが見つかりません", http.StatusNotFound)
 			return
 		}
 
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(score)
 
 	default:
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		http.Error(w, "許可されていないメソッドです", http.StatusMethodNotAllowed)
 	}
 }
