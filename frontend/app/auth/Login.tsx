@@ -1,10 +1,10 @@
 import React from "react";
 import { SafeAreaView, TextInput, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import CustomInput from "@components/CustomInput";
+import CustomButton from "@components/CustomButton";
 import { useState } from "react";
 import axios from "axios";
-import CustomInput from "../components/CustomInput";
-import CustomButton from "../components/CustomButton";
 
 const api = axios.create({
     baseURL: "http://localhost:8080/api",
@@ -18,8 +18,7 @@ type HomeScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
 };
 
-const SignUpScreen = () => {
-    const [name, setName] = useState("");
+const LoginScreen = () => {
     const [passWord, setPassword] = useState("");
     const [email, setEmail] = useState("");
 
@@ -36,7 +35,7 @@ const SignUpScreen = () => {
         <SafeAreaView style={styles.container}>
             <View style={styles.formContainer}>
                 <Text style={styles.title}>新規登録</Text>
-                <CustomInput value={name} onChangeText={setName} placeholder="名前" />
+
                 <CustomInput
                     value={email}
                     onChangeText={setEmail}
@@ -71,17 +70,6 @@ const styles = StyleSheet.create({
         marginBottom: 40,
         color: "#333",
     },
-    input: {
-        height: 50,
-        borderWidth: 1,
-        borderColor: "#ddd",
-        borderRadius: 8,
-        paddingHorizontal: 15,
-        marginBottom: 20,
-        backgroundColor: "#fff",
-        fontSize: 16,
-        color: "#333",
-    },
 });
 
-export default SignUpScreen;
+export default LoginScreen;

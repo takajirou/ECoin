@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Button } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import Layout from "../components/Layout";
+import { router } from "expo-router";
 
 type RootStackParamList = {
     Home: undefined;
@@ -16,12 +16,13 @@ type HomeScreenProps = {
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     return (
-        <Layout>
+        <View>
             <Text>ホーム画面</Text>
-            <Button title="新規登録" onPress={() => navigation.navigate("SignUp")} />
-            <Button title="ログイン" onPress={() => navigation.navigate("Login")} />
-            <Button title="詳細へ" onPress={() => navigation.navigate("Detail")} />
-        </Layout>
+            <Button title="新規登録" onPress={() => router.push("/auth/SignUp")} />
+            <Button title="ログイン" onPress={() => router.push("/auth/Login")} />
+            <Button title="詳細へ" onPress={() => router.push("/details")} />
+
+        </View>
     );
 };
 

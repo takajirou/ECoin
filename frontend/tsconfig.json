@@ -9,7 +9,17 @@
     "noEmit": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./app/*"],
+      "@components/*": ["./components/*"],
+
+    }
   },
-  "extends": "expo/tsconfig.base"
+  "extends": "expo/tsconfig.base",
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }

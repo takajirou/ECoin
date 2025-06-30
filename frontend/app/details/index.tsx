@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text } from "react-native";
-import Layout from "../components/Layout";
+// import Layout from "@components/Layout";
 
 const DetailsScreen = () => {
     return (
-        <Layout>
+        <View>
             <Text>詳細画面</Text>
-        </Layout>
+        </View>
     );
 };
 

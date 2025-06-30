@@ -1,32 +1,23 @@
 import { View, StyleSheet, SafeAreaView, Text, Button, TouchableOpacity } from "react-native";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
-type RootStackParamList = {
-    Home: undefined;
-    Detail: undefined;
-    SignUp: undefined;
-};
+import { router } from "expo-router";
 
 const Footer: React.FC = () => {
-    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
     return (
         <View style={styles.FooterWrap}>
-            <TouchableOpacity style={styles.NavBtnWrap} onPress={() => navigation.navigate("Home")}>
+            <TouchableOpacity style={styles.NavBtnWrap} onPress={() => router.push("/")}>
                 <FontAwesome5 name="calendar-alt" size={28} color="#898888" />
                 <Text style={styles.Text}>統計</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.NavBtnWrap} onPress={() => navigation.navigate("Home")}>
+            <TouchableOpacity style={styles.NavBtnWrap} onPress={() => router.push("/")}>
                 <FontAwesome5 name="tasks" size={28} color="#898888" />
                 <Text style={styles.Text}>タスク</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.NavBtnWrap} onPress={() => navigation.navigate("Home")}>
+            <TouchableOpacity style={styles.NavBtnWrap} onPress={() => router.push("/")}>
                 <FontAwesome5 name="exchange-alt" size={28} color="#898888" />
                 <Text style={styles.Text}>交換</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.NavBtnWrap} onPress={() => navigation.navigate("Home")}>
+            <TouchableOpacity style={styles.NavBtnWrap} onPress={() => router.push("/")}>
                 <Ionicons name="settings-sharp" size={28} color="#898888" />
                 <Text style={styles.Text}>設定</Text>
             </TouchableOpacity>
