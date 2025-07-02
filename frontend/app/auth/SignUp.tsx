@@ -2,29 +2,9 @@ import React from "react";
 import { SafeAreaView, TextInput, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
-import axios from "axios";
 import CustomInput from "@components/CustomInput";
 import CustomButton from "@components/CustomButton";
-import { Picker } from "@react-native-picker/picker";
-
-const api = axios.create({
-    baseURL: "http://localhost:8080/api",
-});
-
-type RootStackParamList = {
-    Home: undefined;
-};
-
-type City = {
-    code: string;
-    name: string;
-};
-
-type Prefecture = {
-    code: string;
-    name: string;
-    cities: City[];
-};
+import { api } from "@/config";
 
 const SignUpScreen = () => {
     const [name, setName] = useState<string>("");
