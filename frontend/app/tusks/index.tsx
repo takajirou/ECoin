@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text } from "react-native";
 // import Layout from "@components/Layout";
 
-const DetailsScreen = () => {
+const Tusks = () => {
     return (
         <View>
             <Text>詳細画面</Text>
@@ -10,4 +10,4 @@ const DetailsScreen = () => {
     );
 };
 
-export default DetailsScreen;
+export default Tusks;

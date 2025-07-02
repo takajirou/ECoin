@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { TextInput, StyleSheet, TextInputProps } from "react-native";
 
 type CustomInputProps = TextInputProps & {
@@ -7,6 +8,7 @@ type CustomInputProps = TextInputProps & {
 };
 
 const CustomInput: React.FC<CustomInputProps> = ({ value, onChangeText, placeholder, ...rest }) => {
+    // const [fieldWidth, setFieldWidth] = useState<string>("");
     return (
         <TextInput
             style={styles.input}

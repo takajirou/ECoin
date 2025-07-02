@@ -5,6 +5,7 @@ import { useState } from "react";
 import axios from "axios";
 import CustomInput from "@components/CustomInput";
 import CustomButton from "@components/CustomButton";
+import { Picker } from "@react-native-picker/picker";
 
 const api = axios.create({
     baseURL: "http://localhost:8080/api",
@@ -14,10 +15,23 @@ type RootStackParamList = {
     Home: undefined;
 };
 
+type City = {
+    code: string;
+    name: string;
+};
+
+type Prefecture = {
+    code: string;
+    name: string;
+    cities: City[];
+};
+
 const SignUpScreen = () => {
-    const [name, setName] = useState("");
-    const [passWord, setPassword] = useState("");
-    const [email, setEmail] = useState("");
+    const [name, setName] = useState<string>("");
+    const [passWord, setPassword] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
+    const [zip, setZip] = useState<string>("");
+    const [address, setAddress] = useState<string>("");
 
     const CreateAcount = async () => {
         try {
@@ -40,6 +54,8 @@ const SignUpScreen = () => {
                     keyboardType="email-address"
                 />
                 <CustomInput value={passWord} placeholder="パスワード" onChangeText={setPassword} />
+                <CustomInput value={zip} onChangeText={setZip} placeholder="郵便番号" />
+                <CustomInput value={address} onChangeText={setAddress} placeholder="住所" />
 
                 <CustomButton onPress={CreateAcount} />
             </View>
