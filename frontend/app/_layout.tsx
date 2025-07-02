@@ -12,41 +12,23 @@ export default function RootLayout() {
 
     return (
         <View style={styles.container}>
-            {pageName !== "auth" ? (
-                <>
-                    <LinearGradient
-                        colors={["rgba(190, 227, 164,1)", "rgba(190, 227, 164, 0.3)"]}
-                        style={styles.gradient}
-                    >
-                        <View style={styles.content}>
-                            <Header />
+            <>
+                <View style={styles.content}>
+                    <Header />
 
-                            <View style={styles.inner}>
-                                <Stack
-                                    screenOptions={{
-                                        headerShown: false,
-                                        contentStyle: { backgroundColor: "transparent" },
-                                    }}
-                                >
-                                    <Stack.Screen name="index" />
-                                </Stack>
-                            </View>
-                        </View>
-                    </LinearGradient>
-                    <Footer />
-                </>
-            ) : (
-                <>
-                    <Stack
-                        screenOptions={{
-                            headerShown: false,
-                            contentStyle: { backgroundColor: "transparent" },
-                        }}
-                    >
-                        <Stack.Screen name="index" />
-                    </Stack>
-                </>
-            )}
+                    <View style={styles.inner}>
+                        <Stack
+                            screenOptions={{
+                                headerShown: false,
+                                contentStyle: { backgroundColor: "transparent" },
+                            }}
+                        >
+                            <Stack.Screen name="index" />
+                        </Stack>
+                    </View>
+                </View>
+                <Footer />
+            </>
         </View>
     );
 }
@@ -54,6 +36,7 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: "#f5f5f5",
     },
     gradient: {
         flex: 1,
