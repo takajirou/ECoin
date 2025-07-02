@@ -36,11 +36,13 @@ func main() {
 	http.HandleFunc("/api/auth/login", controllers.HandleLogin)
 	http.HandleFunc("/api/auth/logout", controllers.HandleLogout)
 	http.HandleFunc("/api/auth/register", controllers.HandleUsers)
+	http.HandleFunc("/api/missions", controllers.HandleMissions)
 
 	// 認証が必要なエンドポイント（一般ユーザー用）
 	http.Handle("/api/me", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMe)))
 	http.Handle("/api/profile", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMyProfile)))
 	http.Handle("/api/status", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMissionStats)))
+	// http.Handle("/api/status", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMissionStats)))
 
 	// 管理者権限が必要なエンドポイント
 	http.Handle("/api/admin/users", 
@@ -52,10 +54,8 @@ func main() {
 		middleware.JWTMiddleware(
 			middleware.AdminMiddleware(
 				http.HandlerFunc(controllers.HandleUserByUUID))))
-
+				
 	http.HandleFunc("/api/users/", controllers.HandleUserByUUID)
-	http.HandleFunc("/api/missions", controllers.HandleMissions)
-	http.HandleFunc("/api/missions/", controllers.HandleMissionStats)
 	http.HandleFunc("/api/user/score/", controllers.HandleUserScore)
 
 	// サーバー起動ポート
