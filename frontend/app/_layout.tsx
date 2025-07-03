@@ -1,6 +1,5 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { Stack } from "expo-router";
 import Header from "../components/Header";
 import { usePathname } from "expo-router";
@@ -43,10 +42,9 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        padding: 10,
+        paddingVertical: 10,
     },
     inner: {
         flex: 1,
-        padding: 16,
     },
 });

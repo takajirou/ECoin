@@ -169,3 +169,5 @@
 2025/07/03 18:10:58 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
 2025/07/03 18:11:56 main.go:86: Server started at http://localhost:8080
 2025/07/03 18:14:41 main.go:86: Server started at http://localhost:8080
+2025/07/03 19:15:55 main.go:87: Server started at http://localhost:8080
+2025/07/03 19:16:26 main.go:87: Server started at http://localhost:8080

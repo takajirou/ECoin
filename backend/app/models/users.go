@@ -114,6 +114,13 @@ func GetUserByEmail(email string) (User, error) {
 	return user, err
 }
 
+func UpdateUserCoin(userID string, coin int) error {
+	cmd := `UPDATE users SET coins = coins + ? WHERE uuid = ?`
+
+	_, err := Db.Exec(cmd, coin, userID)
+	return err
+}
+
 // ユーザー更新
 func (u *User) UpdateUserByUUID() error {
 	if u.UUID == "" {

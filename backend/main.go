@@ -67,6 +67,7 @@ func main() {
 	http.Handle("/api/profile", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMyProfile)))
 	http.Handle("/api/status/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMissionStats)))
 	http.Handle("/api/score/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserScore)))
+	http.Handle("/api/user/coin/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserCoin)))
 
 	// 管理者権限が必要なエンドポイント
 	http.Handle("/api/admin/users", 

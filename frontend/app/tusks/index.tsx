@@ -46,6 +46,14 @@ const Tusks = () => {
             console.error("スコア更新エラー:", error);
         }
     };
+    const UpdateCoin = async (coin: number) => {
+        try {
+            await api.put(`/user/coin/${coin}`);
+            console.log("所持コイン更新");
+        } catch (error) {
+            console.error("コイン更新エラー:", error);
+        }
+    };
 
     useEffect(() => {
         const getMissions = async () => {
@@ -121,6 +129,7 @@ const Tusks = () => {
         });
 
         UpsertScore(totalScore);
+        UpdateCoin(totalScore);
     };
 
     useEffect(() => {
