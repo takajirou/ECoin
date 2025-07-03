@@ -11,7 +11,6 @@ import (
 )
 
 func HandleMissionStats(w http.ResponseWriter, r *http.Request) {
-	// JWTからclaimsを取得
 	claims, ok := r.Context().Value(middleware.UserContextKey).(*utils.Claims)
 	if !ok {
 		http.Error(w, "認証情報の取得に失敗しました", http.StatusUnauthorized)
@@ -20,11 +19,11 @@ func HandleMissionStats(w http.ResponseWriter, r *http.Request) {
 
 	// URLから missionID を取得
 	parts := strings.Split(r.URL.Path, "/")
-	if len(parts) < 5 {
+	if len(parts) < 4 {
 		http.Error(w, "URLが不正です", http.StatusBadRequest)
 		return
 	}
-	missionIDStr := parts[4]
+	missionIDStr := parts[3]
 	missionID, err := strconv.Atoi(missionIDStr)
 	if err != nil {
 		http.Error(w, "mission_id は整数で指定してください", http.StatusBadRequest)

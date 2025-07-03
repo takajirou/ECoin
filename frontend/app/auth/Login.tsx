@@ -5,10 +5,7 @@ import CustomInput from "@components/CustomInput";
 import CustomButton from "@components/CustomButton";
 import { useState } from "react";
 import axios from "axios";
-
-const api = axios.create({
-    baseURL: "http://localhost:8080/api",
-});
+import { api, setToken } from "@/config";
 
 type RootStackParamList = {
     Home: undefined;
@@ -24,10 +21,19 @@ const LoginScreen = () => {
 
     const CreateAcount = async () => {
         try {
-            await api.post("/users", { name: name, email: email, password: passWord });
-            console.log("アカウント作成成功");
+            const response = await api.post("/auth/login", { email: email, password: passWord });
+            console.log("ログイン成功");
+            console.log(response.data);
+            const token = response.data.token;
+            if (token) {
+                // トークンを保存してヘッダーに設定
+                await setToken(token);
+                console.log("トークンを保存しました");
+            } else {
+                console.error("トークンが見つかりません");
+            }
         } catch (error) {
-            console.error("アカウント作成エラー:", error);
+            console.error("ログインエラー:", error);
         }
     };
 
