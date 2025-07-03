@@ -87,7 +87,7 @@ func init() {
 		id INT PRIMARY KEY AUTO_INCREMENT,
 		title VARCHAR(255),
 		description TEXT,
-		difficulty ENUM('easy', 'normal', 'hard'),
+		difficulty ENUM('easy', 'medium', 'hard'),
 		point INT,
 		require_proof BOOLEAN DEFAULT false,
 		active BOOLEAN DEFAULT true,

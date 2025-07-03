@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	createMissions := false // 実行したい時はtrueに変更
+	createMissions := true // 実行したい時はtrueに変更
 	
 	if createMissions {
 		log.Println("ミッションデータの作成を開始します...")
