@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
                 <FontAwesome5 name="calendar-alt" size={28} color="#898888" />
                 <Text style={styles.Text}>統計</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.NavBtnWrap} onPress={() => router.push("/")}>
+            <TouchableOpacity style={styles.NavBtnWrap} onPress={() => router.push("/tusks")}>
                 <FontAwesome5 name="tasks" size={28} color="#898888" />
                 <Text style={styles.Text}>タスク</Text>
             </TouchableOpacity>

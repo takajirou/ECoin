@@ -15,7 +15,7 @@ const SignUpScreen = () => {
 
     const CreateAcount = async () => {
         try {
-            await api.post("/users", { name: name, email: email, password: passWord });
+            await api.post("/auth/register", { name: name, email: email, password: passWord });
             console.log("アカウント作成成功");
         } catch (error) {
             console.error("アカウント作成エラー:", error);

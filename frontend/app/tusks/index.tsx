@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, ScrollView, StyleSheet } from "react-native";
+import {
+    View,
+    Text,
+    ActivityIndicator,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    Animated,
+} from "react-native";
+
 import { api } from "@/config";
-import CustomButton from "@components/CustomButton";
 
 interface Mission {
     id: number;
@@ -18,14 +26,27 @@ const Tusks = () => {
     const [missions, setMissions] = useState<Mission[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedMissions, setSelectedMissions] = useState<number[]>([]);
+    const [slideAnim] = useState(new Animated.Value(100));
+    const [showButton, setShowButton] = useState(false);
+    const [score, setScore] = useState(0);
+
+    const UpsertStatus = async (mission_id: number) => {
+        try {
+            await api.post(`/status/${mission_id}`);
+            console.log("ミッションスタッツ更新");
+        } catch (error) {
+            console.error("ミッションスタッツ更新エラー:", error);
+        }
+    };
 
     useEffect(() => {
         const getMissions = async () => {
             try {
                 setLoading(true);
                 const response = await api.get("/missions");
-                console.log("ミッション取得成功:", response.data);
-                setMissions(response.data || []); // nullの場合は空配列
+
+                setMissions(response.data || []);
                 setError(null);
             } catch (error) {
                 console.error("ミッション取得エラー:", error);
@@ -64,54 +85,158 @@ const Tusks = () => {
         }
     };
 
+    const handleMissionPress = (mission: Mission) => {
+        setSelectedMissions((prev) => {
+            const isSelected = prev.includes(mission.id);
+            if (isSelected) {
+                return prev.filter((id) => id !== mission.id);
+            } else {
+                return [...prev, mission.id];
+            }
+        });
+    };
+
+    const isMissionSelected = (missionId: number) => {
+        return selectedMissions.includes(missionId);
+    };
+
+    // 選択されたミッションを送信する関数
+    const handleSubmitMissions = () => {
+        console.log("選択されたミッション:", selectedMissions);
+
+        selectedMissions.forEach((selectedMission) => {
+            UpsertStatus(selectedMission);
+            missions.forEach((mission) => {
+                if (selectedMission == mission.id) {
+                    setScore((prev) => prev + mission.point);
+                }
+            });
+        });
+    };
+
+    useEffect(() => {
+        if (selectedMissions.length > 0) {
+            setShowButton(true);
+            Animated.timing(slideAnim, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        } else {
+            Animated.timing(slideAnim, {
+                toValue: 100,
+                duration: 300,
+                useNativeDriver: true,
+            }).start(() => {
+                setShowButton(false);
+            });
+        }
+    }, [selectedMissions, slideAnim]);
+
     if (loading) {
         return (
             <View style={styles.centerContainer}>
                 <ActivityIndicator size="large" color="#4CAF50" />
-                <Text style={styles.loadingText}>ミッションを読み込み中...</Text>
+                <Text style={styles.loadingText}>タスクを読み込み中...</Text>
             </View>
         );
     }
 
     return (
-        <ScrollView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.title}>エコミッション</Text>
-            </View>
-
-            {missions.length === 0 ? (
-                <View style={styles.centerContainer}>
-                    <Text style={styles.emptyText}>ミッションがありません</Text>
+        <View style={styles.container}>
+            <ScrollView style={styles.scrollView}>
+                <View style={styles.header}>
+                    <Text style={styles.title}>エコタスク</Text>
                 </View>
-            ) : (
-                missions.map((mission) => (
-                    <View key={mission.id} style={styles.missionCard}>
-                        <View style={styles.missionHeader}>
-                            <Text style={styles.missionTitle}>{mission.title}</Text>
-                            <View
+
+                {missions.length === 0 ? (
+                    <View style={styles.centerContainer}>
+                        <Text style={styles.emptyText}>タスクがありません</Text>
+                    </View>
+                ) : (
+                    missions.map((mission) => (
+                        <TouchableOpacity
+                            key={mission.id}
+                            style={[
+                                styles.missionCard,
+                                isMissionSelected(mission.id) && styles.selectedMissionCard,
+                            ]}
+                            onPress={() => handleMissionPress(mission)}
+                        >
+                            <View style={styles.missionHeader}>
+                                <Text
+                                    style={[
+                                        styles.missionTitle,
+                                        isMissionSelected(mission.id) &&
+                                            styles.selectedMissionTitle,
+                                    ]}
+                                >
+                                    {mission.title}
+                                </Text>
+                                <View
+                                    style={[
+                                        styles.difficultyBadge,
+                                        { backgroundColor: getDifficultyColor(mission.difficulty) },
+                                    ]}
+                                >
+                                    <Text style={styles.difficultyText}>
+                                        {getDifficultyText(mission.difficulty)}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <Text
                                 style={[
-                                    styles.difficultyBadge,
-                                    { backgroundColor: getDifficultyColor(mission.difficulty) },
+                                    styles.missionDescription,
+                                    isMissionSelected(mission.id) &&
+                                        styles.selectedMissionDescription,
                                 ]}
                             >
-                                <Text style={styles.difficultyText}>
-                                    {getDifficultyText(mission.difficulty)}
+                                {mission.description}
+                            </Text>
+
+                            <View style={styles.missionFooter}>
+                                <Text
+                                    style={[
+                                        styles.pointText,
+                                        isMissionSelected(mission.id) && styles.selectedPointText,
+                                    ]}
+                                >
+                                    {mission.point}ポイント
                                 </Text>
+                                {mission.require_proof && (
+                                    <Text style={styles.proofText}>証明必要</Text>
+                                )}
                             </View>
-                        </View>
 
-                        <Text style={styles.missionDescription}>{mission.description}</Text>
-
-                        <View style={styles.missionFooter}>
-                            <Text style={styles.pointText}>{mission.point}ポイント</Text>
-                            {mission.require_proof && (
-                                <Text style={styles.proofText}>証明必要</Text>
+                            {isMissionSelected(mission.id) && (
+                                <View style={styles.selectedIndicator}>
+                                    <Text style={styles.selectedIndicatorText}>✓ 選択済み</Text>
+                                </View>
                             )}
-                        </View>
-                    </View>
-                ))
+                        </TouchableOpacity>
+                    ))
+                )}
+            </ScrollView>
+
+            {/* 送信ボタン（選択されたミッションがある場合のみ表示） */}
+            {showButton && (
+                <Animated.View
+                    style={[
+                        styles.submitBtnContainer,
+                        {
+                            transform: [{ translateY: slideAnim }],
+                        },
+                    ]}
+                >
+                    <TouchableOpacity style={styles.submitBtn} onPress={handleSubmitMissions}>
+                        <Text style={styles.submitBtnText}>
+                            {selectedMissions.length}個のタスクを達成
+                        </Text>
+                    </TouchableOpacity>
+                </Animated.View>
             )}
-        </ScrollView>
+        </View>
     );
 };
 
@@ -119,7 +244,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#f5f5f5",
+    },
+    scrollView: {
+        flex: 1,
         paddingVertical: 16,
+        paddingHorizontal: 16,
     },
     centerContainer: {
         flex: 1,
@@ -171,6 +300,14 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
+        borderWidth: 2,
+        borderColor: "transparent",
+    },
+    selectedMissionCard: {
+        backgroundColor: "#E8F5E8",
+        borderColor: "#4CAF50",
+        elevation: 4,
+        shadowOpacity: 0.2,
     },
     missionHeader: {
         flexDirection: "row",
@@ -184,6 +321,9 @@ const styles = StyleSheet.create({
         color: "#333",
         flex: 1,
         marginRight: 8,
+    },
+    selectedMissionTitle: {
+        color: "#2E7D32",
     },
     difficultyBadge: {
         paddingHorizontal: 8,
@@ -201,6 +341,9 @@ const styles = StyleSheet.create({
         lineHeight: 20,
         marginBottom: 12,
     },
+    selectedMissionDescription: {
+        color: "#2E7D32",
+    },
     missionFooter: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -211,9 +354,52 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "#4CAF50",
     },
+    selectedPointText: {
+        color: "#2E7D32",
+    },
     proofText: {
         fontSize: 12,
         color: "#FF9800",
+        fontWeight: "bold",
+    },
+    selectedIndicator: {
+        position: "absolute",
+        top: 12,
+        right: 12,
+        backgroundColor: "#4CAF50",
+        borderRadius: 12,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+    },
+    selectedIndicatorText: {
+        color: "white",
+        fontSize: 10,
+        fontWeight: "bold",
+    },
+    submitBtnContainer: {
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingHorizontal: 20,
+        paddingVertical: 20,
+        paddingBottom: 30,
+    },
+    submitBtn: {
+        backgroundColor: "#4CAF50",
+        paddingVertical: 15,
+        paddingHorizontal: 30,
+        borderRadius: 25,
+        elevation: 5,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        alignItems: "center",
+    },
+    submitBtnText: {
+        color: "white",
+        fontSize: 16,
         fontWeight: "bold",
     },
 });
