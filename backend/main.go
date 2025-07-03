@@ -66,6 +66,7 @@ func main() {
 	http.Handle("/api/me", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMe)))
 	http.Handle("/api/profile", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMyProfile)))
 	http.Handle("/api/status/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMissionStats)))
+	http.Handle("/api/score/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserScore)))
 
 	// 管理者権限が必要なエンドポイント
 	http.Handle("/api/admin/users", 
@@ -79,7 +80,6 @@ func main() {
 				http.HandlerFunc(controllers.HandleUserByUUID))))
 				
 	http.HandleFunc("/api/users/", controllers.HandleUserByUUID)
-	http.HandleFunc("/api/user/score/", controllers.HandleUserScore)
 
 	// サーバー起動ポート
 	addr := fmt.Sprintf(":%s", config.Config.Port)

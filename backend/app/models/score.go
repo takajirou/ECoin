@@ -28,15 +28,34 @@ func GetScoreByUserPeriod(userID, periodType, periodValue string) (Score, error)
 
 
 // アップサート（存在すれば更新、なければ挿入）
-func (s *Score) UpsertScore() error {
+func UpsertScoreAllPeriods(userID string, score int) error {
+	periods := []struct {
+		periodType  string
+		periodValue string
+	}{
+		{"week", GetCurrentYearWeek()},
+		{"month", GetCurrentYearMonth()},
+	}
+
+	for _, p := range periods {
+		err := UpsertScore(userID, score, p.periodType, p.periodValue)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func UpsertScore(userID string, score int, periodType, periodValue string )error {
 	cmd := `
-	INSERT INTO score (user_id, earn_coin, period_type, period_value, created_at)
-	VALUES (?, ?, ?, ?, NOW())
+	INSERT INTO score (
+		user_id, earn_coin, period_type, period_value, created_at
+	)VALUES (?, ?, ?, ?, NOW())
 	ON DUPLICATE KEY UPDATE
-		earn_coin = VALUES(earn_coin),
+		earn_coin = earn_coin + ?,
 		created_at = NOW()
 	`
-	_, err := Db.Exec(cmd, s.UserID, s.EarnCoin, s.PeriodType, s.PeriodValue)
+	_, err := Db.Exec(cmd, userID, score, periodType, periodValue, score)
 	if err != nil {
 		log.Println("UpsertScore error:", err)
 	}

@@ -29,7 +29,6 @@ const Tusks = () => {
     const [selectedMissions, setSelectedMissions] = useState<number[]>([]);
     const [slideAnim] = useState(new Animated.Value(100));
     const [showButton, setShowButton] = useState(false);
-    const [score, setScore] = useState(0);
 
     const UpsertStatus = async (mission_id: number) => {
         try {
@@ -37,6 +36,14 @@ const Tusks = () => {
             console.log("ミッションスタッツ更新");
         } catch (error) {
             console.error("ミッションスタッツ更新エラー:", error);
+        }
+    };
+    const UpsertScore = async (score: number) => {
+        try {
+            await api.post(`/score/${score}`);
+            console.log("スコア更新");
+        } catch (error) {
+            console.error("スコア更新エラー:", error);
         }
     };
 
@@ -104,14 +111,16 @@ const Tusks = () => {
     const handleSubmitMissions = () => {
         console.log("選択されたミッション:", selectedMissions);
 
+        let totalScore = 0;
         selectedMissions.forEach((selectedMission) => {
             UpsertStatus(selectedMission);
-            missions.forEach((mission) => {
-                if (selectedMission == mission.id) {
-                    setScore((prev) => prev + mission.point);
-                }
-            });
+            const matchedMission = missions.find((m) => m.id === selectedMission);
+            if (matchedMission) {
+                totalScore += matchedMission.point;
+            }
         });
+
+        UpsertScore(totalScore);
     };
 
     useEffect(() => {

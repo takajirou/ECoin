@@ -122,3 +122,50 @@
 2025/07/03 16:02:33 main.go:53: ミッション作成成功: 車・バスを使わず徒歩・自転車で移動
 2025/07/03 16:02:33 main.go:56: ミッションデータの作成が完了しました！
 2025/07/03 16:02:33 main.go:86: Server started at http://localhost:8080
+2025/07/03 17:21:14 main.go:86: Server started at http://localhost:8080
+2025/07/03 17:55:01 main.go:86: Server started at http://localhost:8080
+2025/07/03 17:57:29 main.go:86: Server started at http://localhost:8080
+2025/07/03 17:58:19 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:01:16 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:01:42 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:03:43 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:03:57 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:04:06 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:09 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:09 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:09 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:09 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:09 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:10 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:10 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:10 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:10 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:10 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:10 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:29 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:29 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:30 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:30 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:30 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:30 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:30 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:30 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:30 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:31 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:31 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:31 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:31 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:31 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:31 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:35 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:35 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:35 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:35 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:08:36 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:09:12 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:09:13 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:09:24 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:10:57 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:10:58 score.go:61: UpsertScore error: Error 1265 (01000): Data truncated for column 'period_type' at row 1
+2025/07/03 18:11:56 main.go:86: Server started at http://localhost:8080
+2025/07/03 18:14:41 main.go:86: Server started at http://localhost:8080

@@ -6,6 +6,8 @@ import (
 	"ECoin/utils"
 	"encoding/json"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 func HandleUserScore(w http.ResponseWriter, r *http.Request) {
@@ -15,21 +17,22 @@ func HandleUserScore(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "認証情報の取得に失敗しました", http.StatusUnauthorized)
 		return
 	}
-	userID := claims.UUID
+
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) < 4 {
+		http.Error(w, "URLが不正です", http.StatusBadRequest)
+		return
+	}
+	scoreStr := parts[3]
+	score, err := strconv.Atoi(scoreStr)
+	if err != nil {
+		http.Error(w, "score は整数で指定してください", http.StatusBadRequest)
+		return
+	}
 
 	switch r.Method {
 	case http.MethodPost:
-		var s models.Score
-		err := json.NewDecoder(r.Body).Decode(&s)
-		if err != nil {
-			http.Error(w, "無効なリクエストボディです", http.StatusBadRequest)
-			return
-		}
-
-		// トークンから取得したユーザーIDを使用
-		s.UserID = userID
-
-		err = s.UpsertScore()
+		err := models.UpsertScoreAllPeriods(claims.UUID,score)
 		if err != nil {
 			http.Error(w, "スコアの更新に失敗しました", http.StatusInternalServerError)
 			return
@@ -47,7 +50,7 @@ func HandleUserScore(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		score, err := models.GetScoreByUserPeriod(userID, periodType, periodValue)
+		score, err := models.GetScoreByUserPeriod(claims.UUID, periodType, periodValue)
 		if err != nil {
 			http.Error(w, "スコアが見つかりません", http.StatusNotFound)
 			return
