@@ -40,7 +40,7 @@ const LoginScreen = () => {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.formContainer}>
-                <Text style={styles.title}>新規登録</Text>
+                <Text style={styles.title}>ログイン</Text>
 
                 <CustomInput
                     value={email}
@@ -50,7 +50,7 @@ const LoginScreen = () => {
                 />
                 <CustomInput value={passWord} placeholder="パスワード" onChangeText={setPassword} />
 
-                <CustomButton onPress={CreateAcount} />
+                <CustomButton onPress={CreateAcount} value="ログイン" />
             </View>
         </SafeAreaView>
     );

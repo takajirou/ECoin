@@ -2,12 +2,13 @@ import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps } from "react
 
 type CustomButtonProps = TouchableOpacityProps & {
     onPress: (text: string) => void;
+    value: string;
 };
 
-const CustomButton: React.FC<CustomButtonProps> = ({ onPress, ...rest }) => {
+const CustomButton: React.FC<CustomButtonProps> = ({ value, onPress, ...rest }) => {
     return (
         <TouchableOpacity style={styles.button} onPress={onPress} {...rest}>
-            <Text style={styles.buttonText}>アカウント作成</Text>
+            <Text style={styles.buttonText}>{value}</Text>
         </TouchableOpacity>
     );
 };

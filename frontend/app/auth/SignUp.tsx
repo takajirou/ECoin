@@ -37,7 +37,7 @@ const SignUpScreen = () => {
                 <CustomInput value={zip} onChangeText={setZip} placeholder="郵便番号" />
                 <CustomInput value={address} onChangeText={setAddress} placeholder="住所" />
 
-                <CustomButton onPress={CreateAcount} />
+                <CustomButton onPress={CreateAcount} value="新規登録" />
             </View>
         </SafeAreaView>
     );
