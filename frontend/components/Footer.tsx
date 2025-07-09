@@ -13,7 +13,7 @@ const Footer: React.FC = () => {
                 <FontAwesome5 name="tasks" size={28} color="#898888" />
                 <Text style={styles.Text}>タスク</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.NavBtnWrap} onPress={() => router.push("/")}>
+            <TouchableOpacity style={styles.NavBtnWrap} onPress={() => router.push("/exChange")}>
                 <FontAwesome5 name="exchange-alt" size={28} color="#898888" />
                 <Text style={styles.Text}>交換</Text>
             </TouchableOpacity>

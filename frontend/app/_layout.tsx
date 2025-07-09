@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { Stack } from "expo-router";
 import Header from "../components/Header";
@@ -6,9 +6,6 @@ import { usePathname } from "expo-router";
 import Footer from "../components/Footer";
 
 export default function RootLayout() {
-    const pathname = usePathname();
-    const pageName = pathname.split("/")[1];
-
     return (
         <View style={styles.container}>
             <>
@@ -42,7 +39,7 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        paddingVertical: 10,
+        // paddingVertical: 10,
     },
     inner: {
         flex: 1,

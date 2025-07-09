@@ -37,18 +37,37 @@ func (r *Rewards) CreateRewards() (err error){
 	return nil
 }
 
-func GetRewards() (rewards Rewards, err error) {
-	rewards = Rewards{}
+func GetRewards() (rewards []Rewards, err error) {
+	rewards = []Rewards{}
 
 	cmd := `select id, name, description, required_points, active, created_at from rewards`
 
-	err = Db.QueryRow(cmd).Scan(
-		&rewards.ID,
-		&rewards.Name,
-		&rewards.Description,
-		&rewards.RequiredPoints,
-		&rewards.Active,
-		&rewards.CreatedAt,
-	)
-	return rewards, err
+	rows, err := Db.Query(cmd)
+	if err != nil {
+		return rewards, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var reward Rewards
+		err = rows.Scan(
+			&reward.ID,
+			&reward.Name,
+			&reward.Description,
+			&reward.RequiredPoints,
+			&reward.Active,
+			&reward.CreatedAt,
+		)
+		if err != nil {
+			return rewards, err
+		}
+		rewards = append(rewards, reward)
+	}
+
+	// rows.Next()のループでエラーが発生した場合をチェック
+	if err = rows.Err(); err != nil {
+		return rewards, err
+	}
+
+	return rewards, nil
 }

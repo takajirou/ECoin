@@ -171,3 +171,15 @@
 2025/07/03 18:14:41 main.go:86: Server started at http://localhost:8080
 2025/07/03 19:15:55 main.go:87: Server started at http://localhost:8080
 2025/07/03 19:16:26 main.go:87: Server started at http://localhost:8080
+2025/07/07 13:45:45 main.go:87: Server started at http://localhost:8080
+2025/07/07 14:41:51 main.go:87: Server started at http://localhost:8080
+2025/07/07 14:44:06 main.go:87: Server started at http://localhost:8080
+2025/07/07 14:51:17 main.go:87: Server started at http://localhost:8080
+2025/07/07 15:52:37 main.go:89: Server started at http://localhost:8080
+2025/07/07 15:56:38 main.go:89: Server started at http://localhost:8080
+2025/07/07 15:57:09 rewards.go:15: GetRewards エラー: sql: no rows in result set
+2025/07/07 15:59:35 rewards.go:15: GetRewards エラー: sql: no rows in result set
+2025/07/07 15:59:43 main.go:89: Server started at http://localhost:8080
+2025/07/09 11:13:18 base.go:83: usersテーブル作成エラー: dial tcp 127.0.0.1:3306: connect: connection refused
+2025/07/09 11:17:52 base.go:83: usersテーブル作成エラー: dial tcp 127.0.0.1:3306: connect: connection refused
+2025/07/09 11:27:40 main.go:89: Server started at http://localhost:8080

@@ -62,12 +62,14 @@ func main() {
 	http.HandleFunc("/api/auth/register", controllers.HandleUsers)
 	http.HandleFunc("/api/missions", controllers.HandleMissions)
 
+	
 	// 認証が必要なエンドポイント（一般ユーザー用）
 	http.Handle("/api/me", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMe)))
 	http.Handle("/api/profile", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMyProfile)))
 	http.Handle("/api/status/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMissionStats)))
 	http.Handle("/api/score/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserScore)))
 	http.Handle("/api/user/coin/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserCoin)))
+	http.Handle("/api/rewards", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleRewards)))
 
 	// 管理者権限が必要なエンドポイント
 	http.Handle("/api/admin/users", 
