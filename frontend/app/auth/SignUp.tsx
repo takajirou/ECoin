@@ -5,6 +5,7 @@ import { useState } from "react";
 import CustomInput from "@components/CustomInput";
 import CustomButton from "@components/CustomButton";
 import { api } from "@/config";
+import { router } from "expo-router";
 
 const SignUpScreen = () => {
     const [name, setName] = useState<string>("");
@@ -17,6 +18,7 @@ const SignUpScreen = () => {
         try {
             await api.post("/auth/register", { name: name, email: email, password: passWord });
             console.log("アカウント作成成功");
+            router.push("/");
         } catch (error) {
             console.error("アカウント作成エラー:", error);
         }

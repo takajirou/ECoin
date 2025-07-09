@@ -4,7 +4,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import CustomInput from "@components/CustomInput";
 import CustomButton from "@components/CustomButton";
 import { useState } from "react";
-import axios from "axios";
+import { router } from "expo-router";
 import { api, setToken } from "@/config";
 
 type RootStackParamList = {
@@ -16,10 +16,11 @@ type HomeScreenProps = {
 };
 
 const LoginScreen = () => {
+
     const [passWord, setPassword] = useState("");
     const [email, setEmail] = useState("");
 
-    const CreateAcount = async () => {
+    const LoginAcount = async () => {
         try {
             const response = await api.post("/auth/login", { email: email, password: passWord });
             console.log("ログイン成功");
@@ -32,6 +33,7 @@ const LoginScreen = () => {
             } else {
                 console.error("トークンが見つかりません");
             }
+            router.push("/");
         } catch (error) {
             console.error("ログインエラー:", error);
         }
@@ -50,7 +52,7 @@ const LoginScreen = () => {
                 />
                 <CustomInput value={passWord} placeholder="パスワード" onChangeText={setPassword} />
 
-                <CustomButton onPress={CreateAcount} value="ログイン" />
+                <CustomButton onPress={LoginAcount} value="ログイン" />
             </View>
         </SafeAreaView>
     );
