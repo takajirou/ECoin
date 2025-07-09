@@ -44,12 +44,17 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	// レスポンス作成
 	response := models.LoginResponse{
 		Token: token,
-		User: models.UserInfo{
-			ID:    user.ID,
-			UUID:  user.UUID,
-			Name:  user.Name,
-			Email: user.Email,
-			Admin: user.Admin,
+		User: models.User{
+			ID:			user.ID,
+			UUID:  		user.UUID,
+			Name:  		user.Name,
+			Email: 		user.Email,
+			Password: 	user.Password,
+			Coins: 		user.Coins,
+			Pref: 		user.Pref,
+			City: 		user.City,
+			Admin: 		user.Admin,
+			CreatedAt: 	user.CreatedAt,
 		},
 	}
 
@@ -89,14 +94,19 @@ func HandleMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userInfo := models.UserInfo{
-		ID:    user.ID,
-		UUID:  user.UUID,
-		Name:  user.Name,
-		Email: user.Email,
-		Admin: user.Admin,
+	User := models.User{
+		ID:			user.ID,
+		UUID:  		user.UUID,
+		Name:  		user.Name,
+		Email: 		user.Email,
+		Password: 	user.Password,
+		Coins: 		user.Coins,
+		Pref: 		user.Pref,
+		City: 		user.City,
+		Admin: 		user.Admin,
+		CreatedAt: 	user.CreatedAt,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(userInfo)
+	json.NewEncoder(w).Encode(User)
 }

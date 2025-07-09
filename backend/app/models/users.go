@@ -27,15 +27,7 @@ type LoginRequest struct {
 
 type LoginResponse struct {
 	Token string   `json:"token"`
-	User  UserInfo `json:"user"`
-}
-
-type UserInfo struct {
-	ID    int    `json:"id"`
-	UUID  string `json:"uuid"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	Admin bool   `json:"admin"`
+	User  User `json:"user"`
 }
 
 // ユーザー作成
