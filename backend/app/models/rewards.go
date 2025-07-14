@@ -5,30 +5,33 @@ import (
 	"time"
 )
 
-type Rewards struct {
-	ID 				int
-	Name 			string
-	Description 	string
-	RequiredPoints 	int
-	Active			bool
-	CreatedAt		time.Time
+type Reward struct {
+	ID             int
+	Name           string
+	Description    string
+	RequiredPoints int
+	ImagePath      string
+	Active         bool
+	CreatedAt      time.Time
 }
 
-func (r *Rewards) CreateRewards() (err error){
-	cmd := `insert into users(
+func (r *Reward) CreateReward() (err error) {
+	cmd := `insert into rewards(
 		name,
 		description,
 		required_points,
+		image_path,
 		active,
 		created_at
-	) values (?, ?, ?, ?, ?)`
+	) values (?, ?, ?, ?, ?, ?)`
 
 	_, err = Db.Exec(cmd,
 		r.Name,
 		r.Description,
 		r.RequiredPoints,
+		r.ImagePath,
 		r.Active,
-		time.Now(),
+		r.CreatedAt,
 	)
 	if err != nil {
 		log.Fatalln(err)
@@ -36,11 +39,10 @@ func (r *Rewards) CreateRewards() (err error){
 
 	return nil
 }
+func GetRewards() (rewards []Reward, err error) {
+	rewards = []Reward{}
 
-func GetRewards() (rewards []Rewards, err error) {
-	rewards = []Rewards{}
-
-	cmd := `select id, name, description, required_points, active, created_at from rewards`
+	cmd := `select id, name, description, required_points, image_path, active, created_at from rewards`
 
 	rows, err := Db.Query(cmd)
 	if err != nil {
@@ -49,12 +51,13 @@ func GetRewards() (rewards []Rewards, err error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var reward Rewards
+		var reward Reward
 		err = rows.Scan(
 			&reward.ID,
 			&reward.Name,
 			&reward.Description,
 			&reward.RequiredPoints,
+			&reward.ImagePath,
 			&reward.Active,
 			&reward.CreatedAt,
 		)

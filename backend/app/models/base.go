@@ -22,49 +22,69 @@ var err error
 
 // 使用するユーザーテーブル名を定数で定義
 const (
-	tableNameUser    	 	= "users"
-	tableNameMission 		= "missions"
-	tableNameMissionStats 	= "mission_stats"
-	tableNameScore 		 	= "score"
-	tableNameRewards	 	= "rewards"
-	tableNameUserRewards 	= "user_rewards"
-	tableNameEvents      	= "events"
-	tableNameUserEvents  	= "user_events"
+	tableNameUser         = "users"
+	tableNameMission      = "missions"
+	tableNameMissionStats = "mission_stats"
+	tableNameScore        = "score"
+	tableNameRewards      = "rewards"
+	tableNameUserRewards  = "user_rewards"
+	tableNameEvents       = "events"
+	tableNameUserEvents   = "user_events"
 )
-
 
 // パッケージ初期化時に実行される処理（mainより前に一度だけ実行される）
 func init() {
 	// データベース接続を開く（configで指定されたドライバ・DB名を使用）
 	Db, err = sql.Open(config.Config.SQLDriver, config.GetMySQLDSN())
-    if err != nil {
-        log.Fatalln("DB接続エラー:", err)
-    }
+	if err != nil {
+		log.Fatalln("DB接続エラー:", err)
+	}
 
-    // // 外部キー制約を一時的に無効化（MySQLの場合）
-    // Db.Exec("SET FOREIGN_KEY_CHECKS = 0")
+	// // 外部キー制約を一時的に無効化（MySQLの場合）
+	// Db.Exec("SET FOREIGN_KEY_CHECKS = 0")
 
-    // // すべてのテーブルをDROP（依存関係の逆順）
-    // dropTables := []string{
-    //     tableNameUserEvents,
-    //     tableNameUserRewards,
-    //     tableNameMissionStats,
-    //     tableNameScore,
-    //     tableNameEvents,
-    //     tableNameRewards,
-    //     tableNameMission,
-    //     tableNameUser,
-    // }
+	// // すべてのテーブルをDROP（依存関係の逆順）
+	// dropTables := []string{
+	//     tableNameUserEvents,
+	//     tableNameUserRewards,
+	//     tableNameMissionStats,
+	//     tableNameScore,
+	//     tableNameEvents,
+	//     tableNameRewards,
+	//     tableNameMission,
+	//     tableNameUser,
+	// }
 
-    // for _, tableName := range dropTables {
-    //     cmdDrop := fmt.Sprintf(`DROP TABLE IF EXISTS %s`, tableName)
-    //     if _, err := Db.Exec(cmdDrop); err != nil {
-    //         log.Printf("テーブル削除エラー %s: %v", tableName, err)
-    //     }
-    // }
+	// for _, tableName := range dropTables {
+	//     cmdDrop := fmt.Sprintf(`DROP TABLE IF EXISTS %s`, tableName)
+	//     if _, err := Db.Exec(cmdDrop); err != nil {
+	//         log.Printf("テーブル削除エラー %s: %v", tableName, err)
+	//     }
+	// }
 
-    // // 外部キー制約を再有効化
-    // Db.Exec("SET FOREIGN_KEY_CHECKS = 1")
+	// // 外部キー制約を再有効化
+	// Db.Exec("SET FOREIGN_KEY_CHECKS = 1")
+
+	dropReward := false // 実行したい時はtrueに変更
+	if dropReward {
+		log.Println("rewardテーブルの削除を開始します...")
+
+		// 外部キー制約を一時的に無効化
+		Db.Exec("SET FOREIGN_KEY_CHECKS = 0")
+
+		// rewardテーブルをDROP
+		cmdDrop := fmt.Sprintf(`DROP TABLE IF EXISTS %s`, "rewards")
+		if _, err := Db.Exec(cmdDrop); err != nil {
+			log.Printf("rewardテーブル削除エラー: %v", err)
+		} else {
+			log.Println("rewardテーブルを削除しました")
+		}
+
+		// 外部キー制約を再有効化
+		Db.Exec("SET FOREIGN_KEY_CHECKS = 1")
+
+		log.Println("rewardテーブルの削除が完了しました")
+	}
 
 	cmdU := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INT PRIMARY KEY AUTO_INCREMENT,
@@ -135,6 +155,7 @@ func init() {
 		name VARCHAR(100),
 		description TEXT,
 		required_points INT,
+		image_path VARCHAR(100),
 		active BOOLEAN DEFAULT true,
 		created_at DATETIME
 	)`, tableNameRewards)
@@ -193,11 +214,11 @@ func init() {
 
 }
 func createUUID() uuid.UUID {
-    uuidobj, err := uuid.NewUUID()
-    if err != nil {
-        log.Fatalf("UUID生成エラー: %v", err)
-    }
-    return uuidobj
+	uuidobj, err := uuid.NewUUID()
+	if err != nil {
+		log.Fatalf("UUID生成エラー: %v", err)
+	}
+	return uuidobj
 }
 
 func Encrypt(pw string) string {

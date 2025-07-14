@@ -14,11 +14,11 @@ import (
 )
 
 func main() {
-	createMissions := false // 実行したい時はtrueに変更
-	
+	// ミッション作成のコード
+	createMissions := false
 	if createMissions {
 		log.Println("ミッションデータの作成を開始します...")
-		
+
 		missionsData := []struct {
 			Title         string
 			Description   string
@@ -56,13 +56,53 @@ func main() {
 		log.Println("ミッションデータの作成が完了しました！")
 	}
 
+	// 報酬作成のコード
+	createReward := false
+	if createReward {
+		log.Println("リワードデータの作成を開始します...")
+
+		rewardsData := []struct {
+			Name           string
+			Description    string
+			ImagePath      string
+			RequiredPoints int
+		}{
+			{"エコタオル", "廃材や再生繊維から作られた環境にやさしいタオル", "towel", 10},
+			{"マイボトル", "再利用可能でデザイン性のある水筒", "waterBottle", 10},
+			{"シリコンストロー", "繰り返し使える柔らかいストロー。持ち運びケース付き", "siliconeStraw", 10},
+			{"再生紙ノート", "古紙から作られたノート。ナチュラルな風合いが魅力", "note", 10},
+			{"エコバッグ", "小さく折り畳めるタイプなど種類豊富に展開可能", "bag", 20},
+			{"ラベルレスペットボトル水", "ラベルを省いたシンプルなデザインで、分別・リサイクルがしやすいミネラルウォーター", "labelFree", 20},
+			{"蜜蝋ラップ", "ラップの代わりに使える自然素材のフードラップ", "wrap", 20},
+			{"木製カトラリーセット", "竹や木材を使用したカトラリー。持ち運び袋付き", "cutlery", 30},
+		}
+
+		for i, data := range rewardsData {
+			reward := &models.Reward{
+				Name:           data.Name,
+				Description:    data.Description,
+				ImagePath:      data.ImagePath,
+				RequiredPoints: data.RequiredPoints,
+				Active:         true,
+				CreatedAt:      time.Now(),
+			}
+
+			err := reward.CreateReward()
+			if err != nil {
+				log.Printf("リワード%d作成に失敗: %v\n", i+1, err)
+			} else {
+				log.Printf("リワード作成成功: %s\n", reward.Name)
+			}
+		}
+		log.Println("リワードデータの作成が完了しました！")
+	}
+
 	// 認証が不要なエンドポイント
 	http.HandleFunc("/api/auth/login", controllers.HandleLogin)
 	http.HandleFunc("/api/auth/logout", controllers.HandleLogout)
 	http.HandleFunc("/api/auth/register", controllers.HandleUsers)
 	http.HandleFunc("/api/missions", controllers.HandleMissions)
 
-	
 	// 認証が必要なエンドポイント（一般ユーザー用）
 	http.Handle("/api/me", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMe)))
 	http.Handle("/api/profile", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMyProfile)))
@@ -72,16 +112,16 @@ func main() {
 	http.Handle("/api/rewards", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleRewards)))
 
 	// 管理者権限が必要なエンドポイント
-	http.Handle("/api/admin/users", 
-	middleware.JWTMiddleware(
-		middleware.AdminMiddleware(
-			http.HandlerFunc(controllers.HandleUsers))))
+	http.Handle("/api/admin/users",
+		middleware.JWTMiddleware(
+			middleware.AdminMiddleware(
+				http.HandlerFunc(controllers.HandleUsers))))
 
-	http.Handle("/api/admin/users/", 
+	http.Handle("/api/admin/users/",
 		middleware.JWTMiddleware(
 			middleware.AdminMiddleware(
 				http.HandlerFunc(controllers.HandleUserByUUID))))
-				
+
 	http.HandleFunc("/api/users/", controllers.HandleUserByUUID)
 
 	// サーバー起動ポート
