@@ -4,8 +4,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import CustomInput from "@components/CustomInput";
 import CustomButton from "@components/CustomButton";
 import { useState } from "react";
-import { router } from "expo-router";
+import { router,Link } from "expo-router";
 import { api, setToken } from "@/config";
+
 
 type RootStackParamList = {
     Home: undefined;

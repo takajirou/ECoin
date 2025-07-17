@@ -209,3 +209,5 @@
 2025/07/15 01:37:03 main.go:94: リワード作成成功: 木製カトラリーセット
 2025/07/15 01:37:03 main.go:97: リワードデータの作成が完了しました！
 2025/07/15 01:37:03 main.go:129: Server started at http://localhost:8080
+2025/07/16 11:03:19 main.go:129: Server started at http://localhost:8080
+2025/07/17 14:11:39 main.go:129: Server started at http://localhost:8080
