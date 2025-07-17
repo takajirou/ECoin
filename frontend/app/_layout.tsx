@@ -2,14 +2,15 @@ import { View, StyleSheet } from "react-native";
 import { Stack,usePathname } from "expo-router";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { NativeBaseProvider } from "native-base";
 
 export default function RootLayout() {
     const pathname = usePathname();
     const isAuthPage = pathname.startsWith("/auth");
 
     return (
-        <View style={styles.container}>
-            <>
+        <NativeBaseProvider>
+            <View style={styles.container}>
                 <View style={styles.content}>
                     {!isAuthPage && <Header />}
 
@@ -26,8 +27,8 @@ export default function RootLayout() {
                 </View>
                 <Footer />
                 {/* {!isAuthPage && <Footer />} */}
-            </>
-        </View>
+            </View>
+        </NativeBaseProvider>
     );
 }
 

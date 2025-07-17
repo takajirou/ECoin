@@ -1,22 +1,31 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { api } from "@/config";
 import { useEffect, useState } from "react";
+import { FlatList } from "react-native"; // native-baseではなく react-native の FlatList を使用推奨
 
-interface reward {
-    name: string;
-    description: string;
-    required_points: number;
-    image_path: string;
-    active: number;
-    created_at: Date;
+interface Reward {
+    ID: number;
+    Name: string;
+    Description: string;
+    RequiredPoints: number;
+    ImagePath: string;
+    Active: boolean;
+    CreatedAt: string;
 }
 
-// 
-
+const images: { [key: string]: any } = {
+    bag: require("../../assets/bag.png"),
+    cutlery: require("../../assets/cutlery.png"),
+    labelFree: require("../../assets/labelFree.png"),
+    note: require("../../assets/note.png"),
+    siliconeStraw: require("../../assets/siliconeStraw.png"),
+    towel: require("../../assets/towel.png"),
+    waterBottle: require("../../assets/waterBottle.png"),
+    wrap: require("../../assets/wrap.png"),
+};
 
 const exChange = () => {
-
-    const [rewards, setRewards] = useState<reward[]>([]);
+    const [rewards, setRewards] = useState<Reward[]>([]);
 
     useEffect(() => {
         const getRewards = async () => {
@@ -31,67 +40,82 @@ const exChange = () => {
     }, []);
 
     return (
-        <View style={styles.content}>
-            {rewards.map((reward) => (
-                <View key={reward.name} style={styles.rewardItem}>
-                    <Text style={styles.rewardName}>{reward.name}</Text>
-                    <Text style={styles.rewardDescription}>{reward.description}</Text>
-                    <Image style={styles.rewardImage}/>
-                    <Text style={styles.rewardPoints}>{reward.required_points}ポイント</Text>
+        <FlatList
+            data={rewards}
+            keyExtractor={(item) => item.ID.toString()}
+            numColumns={2}
+            columnWrapperStyle={styles.row}
+            contentContainerStyle={styles.content}
+            renderItem={({ item }) => (
+                <View style={styles.rewardItem}>
+                    <Text style={styles.rewardName}>{item.Name}</Text>
+                    <Text style={styles.rewardDescription}>{item.Description}</Text>
+                    {images[item.ImagePath] ? (
+                        <Image
+                            source={images[item.ImagePath]}
+                            style={styles.rewardImage}
+                            resizeMode="contain"
+                        />
+                    ) : (
+                        <View style={styles.placeholderImage}>
+                            <Text>画像なし</Text>
+                        </View>
+                    )}
+                    <Text style={styles.rewardPoints}>{item.RequiredPoints}ポイント</Text>
                 </View>
-            ))}
-        </View>
+            )}
+        />
     );
 };
 
 const styles = StyleSheet.create({
     content: {
-        flex: 1,
+        padding: 10,
         backgroundColor: "#f5f5f5",
-        padding: 16,
+    },
+    row: {
+        justifyContent: "space-between",
+        marginBottom: 10,
     },
     rewardItem: {
         backgroundColor: "#fff",
-        padding: 16,
-        marginBottom: 12,
+        flex: 1,
+        marginHorizontal: 5,
         borderRadius: 8,
+        padding: 12,
         shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 3.84,
         elevation: 5,
     },
     rewardName: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: "bold",
-        marginBottom: 8,
+        marginBottom: 4,
     },
     rewardDescription: {
-        fontSize: 14,
+        fontSize: 13,
         color: "#666",
-        marginBottom: 12,
+        marginBottom: 8,
     },
     rewardImage: {
-        width: 100,
+        width: "100%",
         height: 100,
-        alignSelf: "center",
-        marginBottom: 12,
+        marginBottom: 8,
+        borderRadius: 8,
     },
     placeholderImage: {
-        width: 100,
+        width: "100%",
         height: 100,
-        alignSelf: "center",
-        marginBottom: 12,
-        backgroundColor: "#f0f0f0",
+        backgroundColor: "#e0e0e0",
         justifyContent: "center",
         alignItems: "center",
+        marginBottom: 8,
         borderRadius: 8,
     },
     rewardPoints: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "600",
         color: "#007AFF",
         textAlign: "center",
