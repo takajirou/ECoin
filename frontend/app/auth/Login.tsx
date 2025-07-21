@@ -4,7 +4,6 @@ import CustomInput from "@components/CustomInput";
 import CustomButton from "@components/CustomButton";
 import { useState } from "react";
 import useLogin from "hooks/useLogin";
-import { router } from "expo-router";
 
 const LoginScreen = () => {
     const [password, setPassword] = useState("");
@@ -17,7 +16,6 @@ const LoginScreen = () => {
             email,
             password,
         });
-        router.push("/");
     };
 
     return (
