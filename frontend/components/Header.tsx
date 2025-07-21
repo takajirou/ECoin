@@ -1,40 +1,19 @@
 import { useEffect, useState } from "react";
 import { View, StyleSheet, SafeAreaView, Text } from "react-native";
 import { Image } from "react-native";
-import { api } from "@/config";
+import useProfile from "hooks/useProfile";
 
 const today = new Date();
 const weekday = ["日", "月", "火", "水", "木", "金", "土"];
 const month = today.getMonth() + 1;
 const date = today.getDate();
 
-interface profileResponse {
-    id: number;
-    uuid: string;
-    name: string;
-    email: string;
-    password: string;
-    coins: number;
-    pref: string | null;
-    city: string | null;
-    admin: number;
-    created_at: Date;
-}
-
 export default function Header() {
-    const [profile, setProfile] = useState<profileResponse | null>(null);
+    const { data, isLoading, isError, error } = useProfile();
 
-    useEffect(() => {
-        const getProfile = async () => {
-            try {
-                const response = await api.get("/me");
-                setProfile(response.data || []);
-            } catch (error) {
-                console.error("プロフィール取得エラー:", error);
-            }
-        };
-        getProfile();
-    }, []);
+    if (isLoading) return <Text>読み込み中...</Text>;
+    if (isError) return <Text>エラー: {error?.message}</Text>;
+    if (!data) return null;
 
     return (
         <SafeAreaView>
@@ -43,9 +22,12 @@ export default function Header() {
                     {month}月{date}日（{weekday[today.getDay()]}）
                 </Text>
                 <View style={styles.Coins}>
-                    <Image style={styles.CoinImg} source={require("../assets/coin.png")} />
+                    <Image
+                        style={styles.CoinImg}
+                        source={require("../assets/coin.png")}
+                    />
                     <Text style={[styles.HeaderTexts, styles.Coin]}>
-                        {profile ? profile.coins : 0}
+                        {data ? data.coins : 0}
                     </Text>
                 </View>
             </View>

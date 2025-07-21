@@ -1,17 +1,7 @@
 import { View, Text, StyleSheet, Image } from "react-native";
-import { api } from "@/config";
-import { useEffect, useState } from "react";
-import { FlatList } from "react-native"; // native-baseではなく react-native の FlatList を使用推奨
-
-interface Reward {
-    ID: number;
-    Name: string;
-    Description: string;
-    RequiredPoints: number;
-    ImagePath: string;
-    Active: boolean;
-    CreatedAt: string;
-}
+import useReward from "hooks/useRewards";
+import { RewardResponse } from "types/rewards";
+import { FlatList } from "react-native";
 
 const images: { [key: string]: any } = {
     bag: require("../../assets/bag.png"),
@@ -25,23 +15,18 @@ const images: { [key: string]: any } = {
 };
 
 const exChange = () => {
-    const [rewards, setRewards] = useState<Reward[]>([]);
+    const { data, isLoading, isError, error } = useReward();
 
-    useEffect(() => {
-        const getRewards = async () => {
-            try {
-                const response = await api.get("/rewards");
-                setRewards(response.data);
-            } catch (error) {
-                console.error("交換品取得エラー:", error);
-            }
-        };
-        getRewards();
-    }, []);
+    if (isLoading) return <Text>読み込み中...</Text>;
+    if (isError) return <Text>エラー: {error?.message}</Text>;
+    if (!data) return null;
+
+    // dataが単一のRewardResponseの場合は配列に変換
+    const rewardsArray = data ? [data] : [];
 
     return (
-        <FlatList
-            data={rewards}
+        <FlatList<RewardResponse>
+            data={rewardsArray}
             keyExtractor={(item) => item.ID.toString()}
             numColumns={2}
             columnWrapperStyle={styles.row}
@@ -49,7 +34,9 @@ const exChange = () => {
             renderItem={({ item }) => (
                 <View style={styles.rewardItem}>
                     <Text style={styles.rewardName}>{item.Name}</Text>
-                    <Text style={styles.rewardDescription}>{item.Description}</Text>
+                    <Text style={styles.rewardDescription}>
+                        {item.Description}
+                    </Text>
                     {images[item.ImagePath] ? (
                         <Image
                             source={images[item.ImagePath]}
@@ -61,7 +48,9 @@ const exChange = () => {
                             <Text>画像なし</Text>
                         </View>
                     )}
-                    <Text style={styles.rewardPoints}>{item.RequiredPoints}ポイント</Text>
+                    <Text style={styles.rewardPoints}>
+                        {item.RequiredPoints}ポイント
+                    </Text>
                 </View>
             )}
         />

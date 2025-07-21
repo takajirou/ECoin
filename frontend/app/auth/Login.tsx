@@ -1,43 +1,23 @@
 import React from "react";
-import { SafeAreaView, TextInput, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import CustomInput from "@components/CustomInput";
 import CustomButton from "@components/CustomButton";
 import { useState } from "react";
-import { router,Link } from "expo-router";
-import { api, setToken } from "@/config";
-
-
-type RootStackParamList = {
-    Home: undefined;
-};
-
-type HomeScreenProps = {
-    navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
-};
+import useLogin from "hooks/useLogin";
+import { router } from "expo-router";
 
 const LoginScreen = () => {
-
-    const [passWord, setPassword] = useState("");
+    const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
 
-    const LoginAcount = async () => {
-        try {
-            const response = await api.post("/auth/login", { email: email, password: passWord });
-            console.log("ログイン成功");
-            console.log(response.data);
-            const token = response.data.token;
-            if (token) {
-                // トークンを保存してヘッダーに設定
-                await setToken(token);
-                console.log("トークンを保存しました");
-            } else {
-                console.error("トークンが見つかりません");
-            }
-            router.push("/");
-        } catch (error) {
-            console.error("ログインエラー:", error);
-        }
+    const loginMutation = useLogin;
+
+    const handleLogin = () => {
+        loginMutation.mutate({
+            email,
+            password,
+        });
+        router.push("/");
     };
 
     return (
@@ -51,9 +31,13 @@ const LoginScreen = () => {
                     placeholder="メールアドレス"
                     keyboardType="email-address"
                 />
-                <CustomInput value={passWord} placeholder="パスワード" onChangeText={setPassword} />
+                <CustomInput
+                    value={password}
+                    placeholder="パスワード"
+                    onChangeText={setPassword}
+                />
 
-                <CustomButton onPress={LoginAcount} value="ログイン" />
+                <CustomButton onPress={handleLogin} value="ログイン" />
             </View>
         </SafeAreaView>
     );

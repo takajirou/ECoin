@@ -1,14 +1,4 @@
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-// APIクライアントの作成
-export const api = axios.create({
-    baseURL: "http://localhost:8080/api",
-    timeout: 10000,
-    headers: {
-        "Content-Type": "application/json",
-    },
-});
 
 // トークンキーの定数
 const TOKEN_KEY = "jwt_token";
@@ -115,7 +105,9 @@ api.interceptors.request.use(
             }
         }
 
-        console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+        console.log(
+            `API Request: ${config.method?.toUpperCase()} ${config.url}`
+        );
         return config;
     },
     (error) => {
@@ -131,7 +123,11 @@ api.interceptors.response.use(
         return response;
     },
     async (error) => {
-        console.error("API エラー:", error.response?.status, error.response?.data || error.message);
+        console.error(
+            "API エラー:",
+            error.response?.status,
+            error.response?.data || error.message
+        );
 
         // 401エラー（認証エラー）の場合
         if (error.response?.status === 401) {
