@@ -9,13 +9,10 @@ const LoginScreen = () => {
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
 
-    const loginMutation = useLogin;
+    const loginMutation = useLogin();
 
     const handleLogin = () => {
-        loginMutation.mutate({
-            email,
-            password,
-        });
+        loginMutation.mutate({ email, password });
     };
 
     return (
