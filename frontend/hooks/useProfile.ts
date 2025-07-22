@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import fetchProfile from "libs/fetchProfile";
 
+
 const useProfile = () => {
     return useQuery({
         queryKey: ["fetchProfile"],

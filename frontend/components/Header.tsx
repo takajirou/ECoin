@@ -11,8 +11,20 @@ const date = today.getDate();
 export default function Header() {
     const { data, isLoading, isError, error } = useProfile();
 
-    if (isLoading) return <Text>読み込み中...</Text>;
-    if (isError) return <Text>エラー: {error?.message}</Text>;
+    if (isLoading) {
+        return( 
+            <SafeAreaView>
+                <Text>読み込み中...</Text>
+            </SafeAreaView>
+        );
+    }
+    if (isError) {
+        return( 
+            <SafeAreaView>
+                <Text>エラー: {error?.message}</Text>
+            </SafeAreaView>
+        );
+    }
     if (!data) return null;
 
     return (
