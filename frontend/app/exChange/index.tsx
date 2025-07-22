@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image,SafeAreaView } from "react-native";
 import useReward from "hooks/useRewards";
 import { RewardResponse } from "types/rewards";
 import { FlatList } from "react-native";
@@ -17,8 +17,8 @@ const images: { [key: string]: any } = {
 const exChange = () => {
     const { data, isLoading, isError, error } = useReward();
 
-    if (isLoading) return <Text>読み込み中...</Text>;
-    if (isError) return <Text>エラー: {error?.message}</Text>;
+    if (isLoading) return <SafeAreaView>読み込み中...</SafeAreaView>;
+    if (isError) return <SafeAreaView>エラー: {error?.message}</SafeAreaView>;
     if (!data) return null;
 
     // dataが単一のRewardResponseの場合は配列に変換

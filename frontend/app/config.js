@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { apiClient } from "libs/apiClient";
 
 // トークンキーの定数
 const TOKEN_KEY = "jwt_token";
@@ -11,7 +12,9 @@ export const setToken = async (token) => {
             await AsyncStorage.setItem(TOKEN_KEY, token);
 
             // デフォルトヘッダーに設定
-            api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+            apiClient.defaults.headers.common[
+                "Authorization"
+            ] = `Bearer ${token}`;
 
             console.log("トークンを設定しました");
         }
@@ -27,7 +30,7 @@ export const removeToken = async () => {
         await AsyncStorage.removeItem(TOKEN_KEY);
 
         // デフォルトヘッダーから削除
-        delete api.defaults.headers.common["Authorization"];
+        delete apiClient.defaults.headers.common["Authorization"];
 
         console.log("トークンを削除しました");
     } catch (error) {
@@ -55,10 +58,10 @@ export const checkTokenValidity = async () => {
         }
 
         // トークンをヘッダーに設定
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
         // 認証が必要なエンドポイントで確認（例：/me）
-        const response = await api.get("/me");
+        const response = await apiClient.get("/me");
         return response.status === 200;
     } catch (error) {
         console.error("トークンの検証に失敗しました:", error);
@@ -74,7 +77,9 @@ export const initializeAuth = async () => {
         const token = await getToken();
         if (token) {
             // トークンをヘッダーに設定
-            api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+            apiClient.defaults.headers.common[
+                "Authorization"
+            ] = `Bearer ${token}`;
 
             // トークンの有効性を確認
             const isValid = await checkTokenValidity();
@@ -95,7 +100,7 @@ export const initializeAuth = async () => {
 };
 
 // リクエストインターセプター
-api.interceptors.request.use(
+apiClient.interceptors.request.use(
     async (config) => {
         // トークンが設定されていない場合、AsyncStorageから取得
         if (!config.headers.Authorization) {
@@ -117,7 +122,7 @@ api.interceptors.request.use(
 );
 
 // レスポンスインターセプター
-api.interceptors.response.use(
+apiClient.interceptors.response.use(
     (response) => {
         console.log(`API Response: ${response.status} ${response.config.url}`);
         return response;
@@ -145,7 +150,7 @@ api.interceptors.response.use(
 // ログイン関数（使用例）
 export const loginUser = async (email, password) => {
     try {
-        const response = await api.post("/auth/login", {
+        const response = await apiClient.post("/auth/login", {
             email,
             password,
         });
@@ -174,7 +179,7 @@ export const logoutUser = async () => {
     try {
         // サーバーにログアウト要求（必要に応じて）
         try {
-            await api.post("/auth/logout");
+            await apiClient.post("/auth/logout");
         } catch (error) {
             console.log("サーバーログアウトエラー:", error);
         }

@@ -1,4 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useMissions } from "hooks/useMissions";
+import { upsertStatus } from "libs/upsertStatus";
+import { upsertScore } from "libs/upsertScore";
+import { updateCoin } from "libs/updateCoin";
+import { Mission } from "types/mission";
+
 import {
     View,
     Text,
@@ -9,70 +15,12 @@ import {
     Animated,
 } from "react-native";
 
-import { api } from "@/config";
-
-interface Mission {
-    id: number;
-    title: string;
-    description: string;
-    difficulty: string;
-    point: number;
-    require_proof: boolean;
-    active: boolean;
-    created_at: string;
-}
-
 const Tusks = () => {
-    const [missions, setMissions] = useState<Mission[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [selectedMissions, setSelectedMissions] = useState<number[]>([]);
     const [slideAnim] = useState(new Animated.Value(100));
     const [showButton, setShowButton] = useState(false);
 
-    const UpsertStatus = async (mission_id: number) => {
-        try {
-            await api.post(`/status/${mission_id}`);
-            console.log("ミッションスタッツ更新");
-        } catch (error) {
-            console.error("ミッションスタッツ更新エラー:", error);
-        }
-    };
-    const UpsertScore = async (score: number) => {
-        try {
-            await api.post(`/score/${score}`);
-            console.log("スコア更新");
-        } catch (error) {
-            console.error("スコア更新エラー:", error);
-        }
-    };
-    const UpdateCoin = async (coin: number) => {
-        try {
-            await api.put(`/user/coin/${coin}`);
-            console.log("所持コイン更新");
-        } catch (error) {
-            console.error("コイン更新エラー:", error);
-        }
-    };
-
-    useEffect(() => {
-        const getMissions = async () => {
-            try {
-                setLoading(true);
-                const response = await api.get("/missions");
-
-                setMissions(response.data || []);
-                setError(null);
-            } catch (error) {
-                console.error("ミッション取得エラー:", error);
-                setError("ミッションの取得に失敗しました");
-                setMissions([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-        getMissions();
-    }, []);
+    const { data: missions = [], isLoading, error } = useMissions();
+    const [selectedMissions, setSelectedMissions] = useState<number[]>([]);
 
     const getDifficultyColor = (difficulty: string) => {
         switch (difficulty) {
@@ -116,20 +64,15 @@ const Tusks = () => {
     };
 
     // 選択されたミッションを送信する関数
-    const handleSubmitMissions = () => {
-        console.log("選択されたミッション:", selectedMissions);
-
+    const handleSubmitMissions = async () => {
         let totalScore = 0;
-        selectedMissions.forEach((selectedMission) => {
-            UpsertStatus(selectedMission);
-            const matchedMission = missions.find((m) => m.id === selectedMission);
-            if (matchedMission) {
-                totalScore += matchedMission.point;
-            }
-        });
-
-        UpsertScore(totalScore);
-        UpdateCoin(totalScore);
+        for (const missionId of selectedMissions) {
+            await upsertStatus(missionId);
+            const mission = missions.find((m) => m.id === missionId);
+            if (mission) totalScore += mission.point;
+        }
+        await upsertScore(totalScore);
+        await updateCoin(totalScore);
     };
 
     useEffect(() => {
@@ -151,7 +94,7 @@ const Tusks = () => {
         }
     }, [selectedMissions, slideAnim]);
 
-    if (loading) {
+    if (isLoading) {
         return (
             <View style={styles.centerContainer}>
                 <ActivityIndicator size="large" color="#4CAF50" />
@@ -177,7 +120,8 @@ const Tusks = () => {
                             key={mission.id}
                             style={[
                                 styles.missionCard,
-                                isMissionSelected(mission.id) && styles.selectedMissionCard,
+                                isMissionSelected(mission.id) &&
+                                    styles.selectedMissionCard,
                             ]}
                             onPress={() => handleMissionPress(mission)}
                         >
@@ -194,7 +138,11 @@ const Tusks = () => {
                                 <View
                                     style={[
                                         styles.difficultyBadge,
-                                        { backgroundColor: getDifficultyColor(mission.difficulty) },
+                                        {
+                                            backgroundColor: getDifficultyColor(
+                                                mission.difficulty
+                                            ),
+                                        },
                                     ]}
                                 >
                                     <Text style={styles.difficultyText}>
@@ -217,19 +165,24 @@ const Tusks = () => {
                                 <Text
                                     style={[
                                         styles.pointText,
-                                        isMissionSelected(mission.id) && styles.selectedPointText,
+                                        isMissionSelected(mission.id) &&
+                                            styles.selectedPointText,
                                     ]}
                                 >
                                     {mission.point}ポイント
                                 </Text>
                                 {mission.require_proof && (
-                                    <Text style={styles.proofText}>証明必要</Text>
+                                    <Text style={styles.proofText}>
+                                        証明必要
+                                    </Text>
                                 )}
                             </View>
 
                             {isMissionSelected(mission.id) && (
                                 <View style={styles.selectedIndicator}>
-                                    <Text style={styles.selectedIndicatorText}>✓ 選択済み</Text>
+                                    <Text style={styles.selectedIndicatorText}>
+                                        ✓ 選択済み
+                                    </Text>
                                 </View>
                             )}
                         </TouchableOpacity>
@@ -247,7 +200,10 @@ const Tusks = () => {
                         },
                     ]}
                 >
-                    <TouchableOpacity style={styles.submitBtn} onPress={handleSubmitMissions}>
+                    <TouchableOpacity
+                        style={styles.submitBtn}
+                        onPress={handleSubmitMissions}
+                    >
                         <Text style={styles.submitBtnText}>
                             {selectedMissions.length}個のタスクを達成
                         </Text>

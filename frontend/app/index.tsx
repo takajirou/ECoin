@@ -1,6 +1,5 @@
 import React from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Text, Button, StyleSheet, SafeAreaView } from "react-native";
 import { router } from "expo-router";
 
 type RootStackParamList = {
@@ -12,11 +11,17 @@ type RootStackParamList = {
 
 const Home = () => {
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Text>ホーム画面</Text>
-            <Button title="新規登録" onPress={() => router.push("/auth/SignUp")} />
-            <Button title="ログイン" onPress={() => router.push("/auth/Login")} />
-        </View>
+            <Button
+                title="新規登録"
+                onPress={() => router.push("/auth/SignUp")}
+            />
+            <Button
+                title="ログイン"
+                onPress={() => router.push("/auth/Login")}
+            />
+        </SafeAreaView>
     );
 };
 const styles = StyleSheet.create({
