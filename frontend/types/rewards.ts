@@ -1,4 +1,4 @@
-export interface Reward {
+export interface RewardResponse {
     ID: number;
     Name: string;
     Description: string;
@@ -7,5 +7,3 @@ export interface Reward {
     Active: boolean;
     CreatedAt: string;
 }
-
-export type RewardResponse = Reward[];

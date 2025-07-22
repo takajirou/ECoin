@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, Image,SafeAreaView } from "react-native";
+import { View, Text, StyleSheet, Image,SafeAreaView,FlatList } from "react-native";
 import useReward from "hooks/useRewards";
 import { RewardResponse } from "types/rewards";
-import { FlatList } from "react-native";
+
 
 const images: { [key: string]: any } = {
     bag: require("../../assets/bag.png"),
@@ -17,12 +17,23 @@ const images: { [key: string]: any } = {
 const exChange = () => {
     const { data, isLoading, isError, error } = useReward();
 
-    if (isLoading) return <SafeAreaView>読み込み中...</SafeAreaView>;
-    if (isError) return <SafeAreaView>エラー: {error?.message}</SafeAreaView>;
+    if (isLoading) {
+        return( 
+            <SafeAreaView>
+                <Text>読み込み中...</Text>
+            </SafeAreaView>
+        );
+    }
+    if (isError) {
+        return( 
+            <SafeAreaView>
+                <Text>エラー: {error?.message}</Text>
+            </SafeAreaView>
+        );
+    }
     if (!data) return null;
 
-    // dataが単一のRewardResponseの場合は配列に変換
-    const rewardsArray = data ? [data] : [];
+    const rewardsArray = Array.isArray(data) ? data : [data];
 
     return (
         <FlatList<RewardResponse>
