@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     rewardPoints: {
         fontSize: 14,
         fontWeight: "600",
-        color: "#007AFF",
+        color: "#4CAF50",
         textAlign: "center",
     },
     // モーダルのスタイル
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     modalPoints: {
         fontSize: 16,
         fontWeight: "600",
-        color: "#007AFF",
+        color: "#4CAF50",
         marginBottom: 16,
         textAlign: "center",
     },
