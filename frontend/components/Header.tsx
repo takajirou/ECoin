@@ -12,14 +12,14 @@ export default function Header() {
     const { data, isLoading, isError, error } = useProfile();
 
     if (isLoading) {
-        return( 
+        return (
             <SafeAreaView>
                 <Text>読み込み中...</Text>
             </SafeAreaView>
         );
     }
     if (isError) {
-        return( 
+        return (
             <SafeAreaView>
                 <Text>エラー: {error?.message}</Text>
             </SafeAreaView>
@@ -49,10 +49,12 @@ export default function Header() {
 
 const styles = StyleSheet.create({
     Wrap: {
-        height: 30,
+        height: 40,
         paddingHorizontal: 10,
         flexDirection: "row",
         justifyContent: "space-between",
+        borderBottomColor: "#000",
+        borderBottomWidth: 1,
     },
     HeaderTexts: {
         fontSize: 24,
