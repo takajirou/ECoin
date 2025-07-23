@@ -3,6 +3,7 @@ import { useMissions } from "hooks/useMissions";
 import { upsertStatus } from "libs/upsertStatus";
 import { upsertScore } from "libs/upsertScore";
 import { updateCoin } from "libs/updateCoin";
+import { useQueryClient } from "@tanstack/react-query";
 import { Mission } from "types/mission";
 
 import {
@@ -13,12 +14,15 @@ import {
     StyleSheet,
     TouchableOpacity,
     Animated,
+    Alert,
 } from "react-native";
 
 const Tusks = () => {
     const [slideAnim] = useState(new Animated.Value(100));
     const [showButton, setShowButton] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const queryClient = useQueryClient();
     const { data: missions = [], isLoading, error } = useMissions();
     const [selectedMissions, setSelectedMissions] = useState<number[]>([]);
 
@@ -65,14 +69,52 @@ const Tusks = () => {
 
     // 選択されたミッションを送信する関数
     const handleSubmitMissions = async () => {
-        let totalScore = 0;
-        for (const missionId of selectedMissions) {
-            await upsertStatus(missionId);
-            const mission = missions.find((m) => m.id === missionId);
-            if (mission) totalScore += mission.point;
+        if (isSubmitting) return; // 重複実行を防ぐ
+
+        setIsSubmitting(true);
+
+        try {
+            let totalScore = 0;
+
+            // 各ミッションを処理
+            for (const missionId of selectedMissions) {
+                await upsertStatus(missionId);
+                const mission = missions.find((m) => m.id === missionId);
+                if (mission) totalScore += mission.point;
+            }
+
+            // スコアとコインを更新
+            await upsertScore(totalScore);
+            await updateCoin(totalScore);
+
+            // キャッシュを無効化して強制的にrefetch
+            await queryClient.invalidateQueries({
+                queryKey: ["fetchProfile"],
+                exact: false, // サブクエリも含めて無効化
+            });
+
+            // 強制的にrefetch（キャッシュを無視）
+            await queryClient.refetchQueries({
+                queryKey: ["fetchProfile"],
+                exact: false,
+                type: "active", // アクティブなクエリのみ
+            });
+
+            Alert.alert(
+                "ミッション達成！",
+                `${selectedMissions.length}つのタスク達成し、${totalScore}ポイント獲得しました！`,
+                [
+                    {
+                        text: "OK",
+                    },
+                ]
+            );
+            setSelectedMissions([]);
+        } catch (error) {
+            console.error("ミッション送信エラー:", error);
+        } finally {
+            setIsSubmitting(false);
         }
-        await upsertScore(totalScore);
-        await updateCoin(totalScore);
     };
 
     useEffect(() => {
@@ -178,13 +220,13 @@ const Tusks = () => {
                                 )}
                             </View>
 
-                            {isMissionSelected(mission.id) && (
+                            {/* {isMissionSelected(mission.id) && (
                                 <View style={styles.selectedIndicator}>
                                     <Text style={styles.selectedIndicatorText}>
                                         ✓ 選択済み
                                     </Text>
                                 </View>
-                            )}
+                            )} */}
                         </TouchableOpacity>
                     ))
                 )}
