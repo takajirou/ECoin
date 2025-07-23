@@ -1,7 +1,13 @@
-import { View, Text, StyleSheet, Image,SafeAreaView,FlatList } from "react-native";
+import {
+    View,
+    Text,
+    StyleSheet,
+    Image,
+    SafeAreaView,
+    FlatList,
+} from "react-native";
 import useReward from "hooks/useRewards";
 import { RewardResponse } from "types/rewards";
-
 
 const images: { [key: string]: any } = {
     bag: require("../../assets/bag.png"),
@@ -18,14 +24,14 @@ const exChange = () => {
     const { data, isLoading, isError, error } = useReward();
 
     if (isLoading) {
-        return( 
+        return (
             <SafeAreaView>
                 <Text>読み込み中...</Text>
             </SafeAreaView>
         );
     }
     if (isError) {
-        return( 
+        return (
             <SafeAreaView>
                 <Text>エラー: {error?.message}</Text>
             </SafeAreaView>
@@ -83,6 +89,10 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
         borderRadius: 8,
         padding: 12,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        alignItems: "center",
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -100,15 +110,15 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     rewardImage: {
-        width: "100%",
+        width: 100,
         height: 100,
         marginBottom: 8,
         borderRadius: 8,
     },
     placeholderImage: {
-        width: "100%",
-        height: 100,
-        backgroundColor: "#e0e0e0",
+        width: 200,
+        height: 150,
+        backgroundColor: "#181616ff",
         justifyContent: "center",
         alignItems: "center",
         marginBottom: 8,
