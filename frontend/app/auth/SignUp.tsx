@@ -1,43 +1,53 @@
 import React from "react";
-import { SafeAreaView, TextInput, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { useState } from "react";
 import CustomInput from "@components/CustomInput";
 import CustomButton from "@components/CustomButton";
-import { api } from "@/config";
-import { router } from "expo-router";
+import useSignUp from "hooks/useSignUp";
 
 const SignUpScreen = () => {
     const [name, setName] = useState<string>("");
-    const [passWord, setPassword] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [zip, setZip] = useState<string>("");
     const [address, setAddress] = useState<string>("");
 
+    const signUpMutation = useSignUp();
+
     const CreateAcount = async () => {
-        try {
-            await api.post("/auth/register", { name: name, email: email, password: passWord });
-            console.log("アカウント作成成功");
-            router.push("/");
-        } catch (error) {
-            console.error("アカウント作成エラー:", error);
-        }
+        signUpMutation.mutate({ name, email, password });
     };
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.formContainer}>
                 <Text style={styles.title}>新規登録</Text>
-                <CustomInput value={name} onChangeText={setName} placeholder="名前" />
+                <CustomInput
+                    value={name}
+                    onChangeText={setName}
+                    placeholder="名前"
+                />
                 <CustomInput
                     value={email}
                     onChangeText={setEmail}
                     placeholder="メールアドレス"
                     keyboardType="email-address"
                 />
-                <CustomInput value={passWord} placeholder="パスワード" onChangeText={setPassword} />
-                <CustomInput value={zip} onChangeText={setZip} placeholder="郵便番号" />
-                <CustomInput value={address} onChangeText={setAddress} placeholder="住所" />
+                <CustomInput
+                    value={password}
+                    placeholder="パスワード"
+                    onChangeText={setPassword}
+                />
+                <CustomInput
+                    value={zip}
+                    onChangeText={setZip}
+                    placeholder="郵便番号"
+                />
+                <CustomInput
+                    value={address}
+                    onChangeText={setAddress}
+                    placeholder="住所"
+                />
 
                 <CustomButton onPress={CreateAcount} value="新規登録" />
             </View>
