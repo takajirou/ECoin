@@ -87,12 +87,6 @@ const Tusks = () => {
             await upsertScore(totalScore);
             await updateCoin("plus", totalScore);
 
-            // キャッシュを無効化して強制的にrefetch
-            await queryClient.invalidateQueries({
-                queryKey: ["fetchProfile"],
-                exact: false, // サブクエリも含めて無効化
-            });
-
             // 強制的にrefetch（キャッシュを無視）
             await queryClient.refetchQueries({
                 queryKey: ["fetchProfile"],

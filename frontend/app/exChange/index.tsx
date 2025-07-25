@@ -15,6 +15,7 @@ import { useState } from "react";
 import ExchangeModal from "@components/exchange/ExchangeModal";
 import postUserReward from "libs/postUserReward";
 import { updateCoin } from "libs/updateCoin";
+import { useQueryClient } from "@tanstack/react-query";
 
 const images: { [key: string]: any } = {
     bag: require("../../assets/bag.png"),
@@ -32,6 +33,7 @@ const exchange = () => {
     const [selectedItem, setSelectedItem] = useState<RewardResponse | null>(
         null
     );
+    const queryClient = useQueryClient();
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     if (isLoading) {
@@ -59,6 +61,11 @@ const exchange = () => {
         if (!selectedItem) return;
         await postUserReward({ reward_id: selectedItem.ID });
         await updateCoin("minus", selectedItem.RequiredPoints);
+
+        await queryClient.refetchQueries({
+            queryKey: ["fetchProfile"],
+            exact: false,
+        });
         Alert.alert("交換完了", `${selectedItem.Name}と交換しました！`, [
             {
                 text: "OK",

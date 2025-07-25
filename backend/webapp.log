@@ -238,3 +238,4 @@
 2025/07/23 15:27:49 main.go:130: Server started at http://localhost:8080
 2025/07/23 15:27:56 user_rewards_controller.go:28: リクエストのデコードに失敗: EOF
 2025/07/25 18:27:26 main.go:130: Server started at http://localhost:8080
+2025/07/25 19:23:50 main.go:131: Server started at http://localhost:8080
