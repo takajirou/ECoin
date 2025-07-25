@@ -7,43 +7,50 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
+type CoinRequest struct {
+	Coin int `json:"coin"`
+}
+
 func HandleUserCoin(w http.ResponseWriter, r *http.Request) {
-	// JWTトークンからユーザー情報を取得
 	claims, ok := r.Context().Value(middleware.UserContextKey).(*utils.Claims)
 	if !ok {
 		http.Error(w, "認証情報の取得に失敗しました", http.StatusUnauthorized)
 		return
 	}
 
-	// URLから missionID を取得
-	parts := strings.Split(r.URL.Path, "/")
-	if len(parts) < 5 {
-		http.Error(w, "URLが不正です", http.StatusBadRequest)
+	if r.Method != http.MethodPut {
+		http.Error(w, "許可されていないメソッドです", http.StatusMethodNotAllowed)
 		return
 	}
-	coinStr := parts[4]
-	coin, err := strconv.Atoi(coinStr)
+
+	var req CoinRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "リクエストボディの解析に失敗しました", http.StatusBadRequest)
+		return
+	}
+
+	// パスから plus or minus を判定
+	action := "plus"
+	if strings.Contains(r.URL.Path, "/minus") {
+		action = "minus"
+	}
+
+	coin := req.Coin
+	if action == "minus" {
+		coin = -coin
+	}
+
+	err := models.UpdateUserCoin(claims.UUID, coin)
 	if err != nil {
-		http.Error(w, "coin は整数で指定してください", http.StatusBadRequest)
+		http.Error(w, "コインの更新に失敗しました", http.StatusInternalServerError)
 		return
 	}
 
-	if r.Method == http.MethodPut {
-		err := models.UpdateUserCoin(claims.UUID, coin)
-		if err != nil {
-			http.Error(w, "累計コインの更新に失敗しました。", http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{"message": "ミッション統計を更新しました"})
-		return
-	}
-
-	http.Error(w, "許可されていないメソッドです", http.StatusMethodNotAllowed)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"message": "コインを更新しました"})
 }
 
 // 一般ユーザー用：自分の情報のみ操作
@@ -83,7 +90,7 @@ func HandleMyProfile(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// JWTトークンのUUIDを使用（URLのUUIDは無視）
+		// JWTトークンのUUIDを使用
 		u.UUID = claims.UUID
 
 		// 管理者権限は一般ユーザーが変更できない

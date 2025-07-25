@@ -13,7 +13,7 @@ func HandleRewards(w http.ResponseWriter, r *http.Request) {
 		rewards, err := models.GetRewards()
 		if err != nil {
 			log.Println("GetRewards エラー:", err)
-			http.Error(w, "ミッションの取得に失敗しました", http.StatusInternalServerError)
+			http.Error(w, "報酬一覧の取得に失敗しました", http.StatusInternalServerError)
 			return
 		}
 

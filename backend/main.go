@@ -1,9 +1,9 @@
 package main
 
 import (
+	"ECoin/app/controllers"
 	"ECoin/app/models"
 	"ECoin/config"
-	"ECoin/controllers"
 	"ECoin/middleware"
 	"fmt"
 	"log"
@@ -108,8 +108,10 @@ func main() {
 	http.Handle("/api/profile", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMyProfile)))
 	http.Handle("/api/status/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMissionStats)))
 	http.Handle("/api/score/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserScore)))
-	http.Handle("/api/user/coin/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserCoin)))
+	http.Handle("/api/user/coin/plus", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserCoin)))
+	http.Handle("/api/user/coin/minus", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserCoin)))
 	http.Handle("/api/rewards", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleRewards)))
+	http.Handle("/api/user/rewards", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserRewards)))
 
 	// 管理者権限が必要なエンドポイント
 	http.Handle("/api/admin/users",

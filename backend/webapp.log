@@ -235,3 +235,6 @@
 2025/07/23 13:48:04 main.go:94: リワード作成成功: 木製カトラリーセット
 2025/07/23 13:48:04 main.go:97: リワードデータの作成が完了しました！
 2025/07/23 13:48:04 main.go:129: Server started at http://localhost:8080
+2025/07/23 15:27:49 main.go:130: Server started at http://localhost:8080
+2025/07/23 15:27:56 user_rewards_controller.go:28: リクエストのデコードに失敗: EOF
+2025/07/25 18:27:26 main.go:130: Server started at http://localhost:8080

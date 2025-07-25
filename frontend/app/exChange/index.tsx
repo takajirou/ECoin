@@ -13,6 +13,8 @@ import useReward from "hooks/useRewards";
 import { RewardResponse } from "types/rewards";
 import { useState } from "react";
 import ExchangeModal from "@components/exchange/ExchangeModal";
+import postUserReward from "libs/postUserReward";
+import { updateCoin } from "libs/updateCoin";
 
 const images: { [key: string]: any } = {
     bag: require("../../assets/bag.png"),
@@ -53,9 +55,10 @@ const exchange = () => {
         setIsModalVisible(true);
     };
 
-    const handleExchange = () => {
+    const handleExchange = async () => {
         if (!selectedItem) return;
-
+        await postUserReward({ reward_id: selectedItem.ID });
+        await updateCoin("minus", selectedItem.RequiredPoints);
         Alert.alert("交換完了", `${selectedItem.Name}と交換しました！`, [
             {
                 text: "OK",

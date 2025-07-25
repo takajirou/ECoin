@@ -1,5 +1,5 @@
 import { apiClient } from "./apiClient";
 
-export const updateCoin = async (coin: number) => {
-    await apiClient.put(`/user/coin/${coin}`);
+export const updateCoin = async (action: "plus" | "minus", coin: number) => {
+    await apiClient.put(`/user/coin/${action}`, { coin });
 };
