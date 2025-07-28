@@ -5,6 +5,7 @@ import { upsertScore } from "libs/upsertScore";
 import { updateCoin } from "libs/updateCoin";
 import { useQueryClient } from "@tanstack/react-query";
 import { Mission } from "types/mission";
+import TaskCard from "@components/tasks/TaskCard";
 
 import {
     View,
@@ -17,7 +18,7 @@ import {
     Alert,
 } from "react-native";
 
-const Tusks = () => {
+const Tasks = () => {
     const [slideAnim] = useState(new Animated.Value(100));
     const [showButton, setShowButton] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,32 +26,6 @@ const Tusks = () => {
     const queryClient = useQueryClient();
     const { data: missions = [], isLoading, error } = useMissions();
     const [selectedMissions, setSelectedMissions] = useState<number[]>([]);
-
-    const getDifficultyColor = (difficulty: string) => {
-        switch (difficulty) {
-            case "easy":
-                return "#4CAF50";
-            case "medium":
-                return "#FF9800";
-            case "hard":
-                return "#F44336";
-            default:
-                return "#9E9E9E";
-        }
-    };
-
-    const getDifficultyText = (difficulty: string) => {
-        switch (difficulty) {
-            case "easy":
-                return "簡単";
-            case "medium":
-                return "普通";
-            case "hard":
-                return "難しい";
-            default:
-                return difficulty;
-        }
-    };
 
     const handleMissionPress = (mission: Mission) => {
         setSelectedMissions((prev) => {
@@ -152,76 +127,12 @@ const Tusks = () => {
                     </View>
                 ) : (
                     missions.map((mission) => (
-                        <TouchableOpacity
+                        <TaskCard
                             key={mission.id}
-                            style={[
-                                styles.missionCard,
-                                isMissionSelected(mission.id) &&
-                                    styles.selectedMissionCard,
-                            ]}
-                            onPress={() => handleMissionPress(mission)}
-                        >
-                            <View style={styles.missionHeader}>
-                                <Text
-                                    style={[
-                                        styles.missionTitle,
-                                        isMissionSelected(mission.id) &&
-                                            styles.selectedMissionTitle,
-                                    ]}
-                                >
-                                    {mission.title}
-                                </Text>
-                                <View
-                                    style={[
-                                        styles.difficultyBadge,
-                                        {
-                                            backgroundColor: getDifficultyColor(
-                                                mission.difficulty
-                                            ),
-                                        },
-                                    ]}
-                                >
-                                    <Text style={styles.difficultyText}>
-                                        {getDifficultyText(mission.difficulty)}
-                                    </Text>
-                                </View>
-                            </View>
-
-                            <Text
-                                style={[
-                                    styles.missionDescription,
-                                    isMissionSelected(mission.id) &&
-                                        styles.selectedMissionDescription,
-                                ]}
-                            >
-                                {mission.description}
-                            </Text>
-
-                            <View style={styles.missionFooter}>
-                                <Text
-                                    style={[
-                                        styles.pointText,
-                                        isMissionSelected(mission.id) &&
-                                            styles.selectedPointText,
-                                    ]}
-                                >
-                                    {mission.point}ポイント
-                                </Text>
-                                {mission.require_proof && (
-                                    <Text style={styles.proofText}>
-                                        証明必要
-                                    </Text>
-                                )}
-                            </View>
-
-                            {/* {isMissionSelected(mission.id) && (
-                                <View style={styles.selectedIndicator}>
-                                    <Text style={styles.selectedIndicatorText}>
-                                        ✓ 選択済み
-                                    </Text>
-                                </View>
-                            )} */}
-                        </TouchableOpacity>
+                            mission={mission}
+                            isSelected={isMissionSelected(mission.id)}
+                            onPress={handleMissionPress}
+                        />
                     ))
                 )}
             </ScrollView>
@@ -277,114 +188,15 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "#333",
     },
-    refreshButton: {
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-    },
     loadingText: {
         marginTop: 10,
         fontSize: 16,
         color: "#666",
     },
-    errorText: {
-        fontSize: 16,
-        color: "#F44336",
-        textAlign: "center",
-        marginBottom: 20,
-    },
-    retryButton: {
-        backgroundColor: "#F44336",
-    },
     emptyText: {
         fontSize: 16,
         color: "#666",
         textAlign: "center",
-    },
-    missionCard: {
-        backgroundColor: "white",
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 12,
-        elevation: 2,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        borderWidth: 2,
-        borderColor: "transparent",
-    },
-    selectedMissionCard: {
-        backgroundColor: "#E8F5E8",
-        borderColor: "#4CAF50",
-        elevation: 4,
-        shadowOpacity: 0.2,
-    },
-    missionHeader: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-        marginBottom: 8,
-    },
-    missionTitle: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: "#333",
-        flex: 1,
-        marginRight: 8,
-    },
-    selectedMissionTitle: {
-        color: "#2E7D32",
-    },
-    difficultyBadge: {
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 12,
-    },
-    difficultyText: {
-        color: "white",
-        fontSize: 12,
-        fontWeight: "bold",
-    },
-    missionDescription: {
-        fontSize: 14,
-        color: "#666",
-        lineHeight: 20,
-        marginBottom: 12,
-    },
-    selectedMissionDescription: {
-        color: "#2E7D32",
-    },
-    missionFooter: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    pointText: {
-        fontSize: 16,
-        fontWeight: "bold",
-        color: "#4CAF50",
-    },
-    selectedPointText: {
-        color: "#2E7D32",
-    },
-    proofText: {
-        fontSize: 12,
-        color: "#FF9800",
-        fontWeight: "bold",
-    },
-    selectedIndicator: {
-        position: "absolute",
-        top: 12,
-        right: 12,
-        backgroundColor: "#4CAF50",
-        borderRadius: 12,
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-    },
-    selectedIndicatorText: {
-        color: "white",
-        fontSize: 10,
-        fontWeight: "bold",
     },
     submitBtnContainer: {
         position: "absolute",
@@ -414,4 +226,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Tusks;
+export default Tasks;

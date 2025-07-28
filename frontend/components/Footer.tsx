@@ -14,7 +14,7 @@ const Footer: React.FC = () => {
             </TouchableOpacity>
             <TouchableOpacity
                 style={styles.NavBtnWrap}
-                onPress={() => router.push("/tusks")}
+                onPress={() => router.push("/tasks")}
             >
                 <FontAwesome5 name="tasks" size={28} color="#898888" />
                 <Text style={styles.Text}>タスク</Text>
