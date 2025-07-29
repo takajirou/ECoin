@@ -1,14 +1,45 @@
-import { View, StyleSheet } from "react-native";
-import { Stack, usePathname } from "expo-router";
+// app/_layout.tsx または app/+layout.tsx 相当のファイル（RootLayout）
+
+import { View, StyleSheet, ActivityIndicator } from "react-native";
+import { Stack, usePathname, useRouter } from "expo-router";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { NativeBaseProvider } from "native-base";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { initializeAuth } from "./config";
+
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
     const pathname = usePathname();
+    const router = useRouter();
     const isAuthPage = pathname.startsWith("/auth");
+
+    const [authChecked, setAuthChecked] = useState(false);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const isValid = await initializeAuth();
+
+            if (!isValid && !isAuthPage) {
+                // トークン無効かつ非認証ページにいる場合 → loginへ
+                router.replace("/auth/login");
+            }
+
+            setAuthChecked(true);
+        };
+
+        checkAuth();
+    }, []);
+
+    if (!authChecked && !isAuthPage) {
+        return (
+            <View style={styles.loading}>
+                <ActivityIndicator size="large" color="#666" />
+            </View>
+        );
+    }
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -31,7 +62,6 @@ export default function RootLayout() {
                         </View>
                     </View>
                     <Footer />
-                    {/* {!isAuthPage && <Footer />} */}
                 </View>
             </NativeBaseProvider>
         </QueryClientProvider>
@@ -43,14 +73,15 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#f5f5f5",
     },
-    gradient: {
-        flex: 1,
-    },
     content: {
         flex: 1,
-        // paddingVertical: 10,
     },
     inner: {
         flex: 1,
+    },
+    loading: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
     },
 });
