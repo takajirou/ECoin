@@ -147,7 +147,7 @@ apiClient.interceptors.response.use(
     }
 );
 
-// ログイン関数（使用例）
+// ログイン関数
 export const loginUser = async (email, password) => {
     try {
         const response = await apiClient.post("/auth/login", {
@@ -177,7 +177,6 @@ export const loginUser = async (email, password) => {
 // ログアウト関数
 export const logoutUser = async () => {
     try {
-        // サーバーにログアウト要求（必要に応じて）
         try {
             await apiClient.post("/auth/logout");
         } catch (error) {

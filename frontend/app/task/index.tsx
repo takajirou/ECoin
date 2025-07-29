@@ -4,6 +4,7 @@ import { upsertStatus } from "libs/upsertStatus";
 import { upsertScore } from "libs/upsertScore";
 import { updateCoin } from "libs/updateCoin";
 import { useQueryClient } from "@tanstack/react-query";
+import useProfile from "hooks/useProfile";
 import { Mission } from "types/mission";
 import TaskCard from "@components/tasks/TaskCard";
 
@@ -16,14 +17,23 @@ import {
     TouchableOpacity,
     Animated,
     Alert,
+    Modal,
+    TextInput,
 } from "react-native";
 
 const Tasks = () => {
     const [slideAnim] = useState(new Animated.Value(100));
     const [showButton, setShowButton] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingMission, setEditingMission] = useState<Mission | null>(null);
+    const [missionTitle, setMissionTitle] = useState("");
+    const [missionDescription, setMissionDescription] = useState("");
+    const [missionPoint, setMissionPoint] = useState("");
 
     const queryClient = useQueryClient();
+    const { data: profile, isLoading: isProfileLoading } = useProfile();
+    const isAdmin = profile?.admin == 1;
     const { data: missions = [], isLoading, error } = useMissions();
     const [selectedMissions, setSelectedMissions] = useState<number[]>([]);
 
@@ -40,6 +50,105 @@ const Tasks = () => {
 
     const isMissionSelected = (missionId: number) => {
         return selectedMissions.includes(missionId);
+    };
+
+    // Admin用の編集機能
+    const handleEditMission = (mission?: Mission) => {
+        if (mission) {
+            setEditingMission(mission);
+            setMissionTitle(mission.title || "");
+            setMissionDescription(mission.description || "");
+            setMissionPoint(mission.point?.toString() || "");
+        } else {
+            // 新規作成の場合
+            setEditingMission(null);
+            setMissionTitle("");
+            setMissionDescription("");
+            setMissionPoint("");
+        }
+        setIsEditing(true);
+    };
+
+    const handleSaveMission = async () => {
+        if (!missionTitle.trim() || !missionPoint.trim()) {
+            Alert.alert("エラー", "タイトルとポイントは必須です");
+            return;
+        }
+
+        try {
+            const missionData = {
+                title: missionTitle.trim(),
+                description: missionDescription.trim(),
+                point: parseInt(missionPoint),
+            };
+
+            if (editingMission) {
+                // 既存ミッションの更新
+                // await updateMission(editingMission.id, missionData);
+                console.log("ミッション更新:", {
+                    id: editingMission.id,
+                    ...missionData,
+                });
+            } else {
+                // 新規ミッション作成
+                // await createMission(missionData);
+                console.log("ミッション作成:", missionData);
+            }
+
+            // ミッション一覧を再取得
+            await queryClient.refetchQueries({
+                queryKey: ["missions"],
+                exact: false,
+            });
+
+            Alert.alert(
+                "成功",
+                editingMission
+                    ? "ミッションを更新しました"
+                    : "ミッションを作成しました"
+            );
+            handleCancelEdit();
+        } catch (error) {
+            console.error("ミッション保存エラー:", error);
+            Alert.alert("エラー", "ミッションの保存に失敗しました");
+        }
+    };
+
+    const handleDeleteMission = async (mission: Mission) => {
+        Alert.alert("確認", `「${mission.title}」を削除しますか？`, [
+            {
+                text: "キャンセル",
+                style: "cancel",
+            },
+            {
+                text: "削除",
+                style: "destructive",
+                onPress: async () => {
+                    try {
+                        // await deleteMission(mission.id);
+                        console.log("ミッション削除:", mission.id);
+
+                        await queryClient.refetchQueries({
+                            queryKey: ["missions"],
+                            exact: false,
+                        });
+
+                        Alert.alert("成功", "ミッションを削除しました");
+                    } catch (error) {
+                        console.error("ミッション削除エラー:", error);
+                        Alert.alert("エラー", "ミッションの削除に失敗しました");
+                    }
+                },
+            },
+        ]);
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setEditingMission(null);
+        setMissionTitle("");
+        setMissionDescription("");
+        setMissionPoint("");
     };
 
     // 選択されたミッションを送信する関数
@@ -105,7 +214,7 @@ const Tasks = () => {
         }
     }, [selectedMissions, slideAnim]);
 
-    if (isLoading) {
+    if (isLoading || isProfileLoading) {
         return (
             <View style={styles.centerContainer}>
                 <ActivityIndicator size="large" color="#4CAF50" />
@@ -119,6 +228,14 @@ const Tasks = () => {
             <ScrollView style={styles.scrollView}>
                 <View style={styles.header}>
                     <Text style={styles.title}>エコタスク</Text>
+                    {isAdmin && (
+                        <TouchableOpacity
+                            style={styles.addButton}
+                            onPress={() => handleEditMission()}
+                        >
+                            <Text style={styles.addButtonText}>+ 追加</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 {missions.length === 0 ? (
@@ -127,12 +244,37 @@ const Tasks = () => {
                     </View>
                 ) : (
                     missions.map((mission) => (
-                        <TaskCard
-                            key={mission.id}
-                            mission={mission}
-                            isSelected={isMissionSelected(mission.id)}
-                            onPress={handleMissionPress}
-                        />
+                        <View key={mission.id} style={styles.missionContainer}>
+                            <TaskCard
+                                mission={mission}
+                                isSelected={isMissionSelected(mission.id)}
+                                onPress={handleMissionPress}
+                            />
+                            {isAdmin && (
+                                <View style={styles.adminButtons}>
+                                    <TouchableOpacity
+                                        style={styles.editButton}
+                                        onPress={() =>
+                                            handleEditMission(mission)
+                                        }
+                                    >
+                                        <Text style={styles.editButtonText}>
+                                            編集
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.deleteButton}
+                                        onPress={() =>
+                                            handleDeleteMission(mission)
+                                        }
+                                    >
+                                        <Text style={styles.deleteButtonText}>
+                                            削除
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            )}
+                        </View>
                     ))
                 )}
             </ScrollView>
@@ -157,6 +299,79 @@ const Tasks = () => {
                     </TouchableOpacity>
                 </Animated.View>
             )}
+
+            {/* ミッション編集モーダル */}
+            <Modal
+                visible={isEditing}
+                transparent
+                animationType="fade"
+                onRequestClose={handleCancelEdit}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalTitle}>
+                            {editingMission
+                                ? "ミッションを編集"
+                                : "新しいミッションを作成"}
+                        </Text>
+
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.inputLabel}>タイトル *</Text>
+                            <TextInput
+                                style={styles.textInput}
+                                value={missionTitle}
+                                onChangeText={setMissionTitle}
+                                placeholder="ミッションのタイトルを入力"
+                                maxLength={100}
+                            />
+                        </View>
+
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.inputLabel}>説明</Text>
+                            <TextInput
+                                style={[styles.textInput, styles.textAreaInput]}
+                                value={missionDescription}
+                                onChangeText={setMissionDescription}
+                                placeholder="ミッションの詳細説明を入力"
+                                multiline
+                                numberOfLines={3}
+                                maxLength={500}
+                            />
+                        </View>
+
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.inputLabel}>ポイント *</Text>
+                            <TextInput
+                                style={styles.textInput}
+                                value={missionPoint}
+                                onChangeText={setMissionPoint}
+                                placeholder="獲得ポイントを入力"
+                                keyboardType="numeric"
+                                maxLength={10}
+                            />
+                        </View>
+
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity
+                                style={styles.cancelButton}
+                                onPress={handleCancelEdit}
+                            >
+                                <Text style={styles.cancelButtonText}>
+                                    キャンセル
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.saveButton}
+                                onPress={handleSaveMission}
+                            >
+                                <Text style={styles.saveButtonText}>
+                                    {editingMission ? "更新" : "作成"}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -187,6 +402,49 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: "bold",
         color: "#333",
+    },
+    addButton: {
+        backgroundColor: "#4CAF50",
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        borderRadius: 20,
+    },
+    addButtonText: {
+        color: "white",
+        fontSize: 14,
+        fontWeight: "bold",
+    },
+    missionContainer: {
+        marginBottom: 10,
+    },
+    adminButtons: {
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        marginTop: 5,
+        paddingHorizontal: 10,
+    },
+    editButton: {
+        backgroundColor: "#2196F3",
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 15,
+        marginRight: 8,
+    },
+    editButtonText: {
+        color: "white",
+        fontSize: 12,
+        fontWeight: "bold",
+    },
+    deleteButton: {
+        backgroundColor: "#f44336",
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 15,
+    },
+    deleteButtonText: {
+        color: "white",
+        fontSize: 12,
+        fontWeight: "bold",
     },
     loadingText: {
         marginTop: 10,
@@ -220,6 +478,79 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     submitBtnText: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    modalContainer: {
+        backgroundColor: "#fff",
+        borderRadius: 12,
+        padding: 20,
+        margin: 20,
+        maxWidth: 400,
+        width: "90%",
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "#333",
+        textAlign: "center",
+        marginBottom: 20,
+    },
+    inputContainer: {
+        marginBottom: 15,
+    },
+    inputLabel: {
+        fontSize: 14,
+        fontWeight: "bold",
+        color: "#333",
+        marginBottom: 5,
+    },
+    textInput: {
+        borderWidth: 1,
+        borderColor: "#ddd",
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        fontSize: 16,
+        backgroundColor: "#f9f9f9",
+    },
+    textAreaInput: {
+        height: 80,
+        textAlignVertical: "top",
+    },
+    modalButtons: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginTop: 20,
+    },
+    cancelButton: {
+        flex: 1,
+        backgroundColor: "#9E9E9E",
+        paddingVertical: 12,
+        borderRadius: 8,
+        marginRight: 10,
+        alignItems: "center",
+    },
+    cancelButtonText: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    saveButton: {
+        flex: 1,
+        backgroundColor: "#4CAF50",
+        paddingVertical: 12,
+        borderRadius: 8,
+        alignItems: "center",
+    },
+    saveButtonText: {
         color: "white",
         fontSize: 16,
         fontWeight: "bold",

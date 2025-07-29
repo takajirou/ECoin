@@ -124,7 +124,11 @@ func main() {
 			middleware.AdminMiddleware(
 				http.HandlerFunc(controllers.HandleUserByUUID))))
 
-	http.HandleFunc("/api/users/", controllers.HandleUserByUUID)
+	http.Handle("/api/admin/missions/",
+		middleware.JWTMiddleware(
+			middleware.AdminMiddleware(
+				http.HandlerFunc(controllers.HandleUserByUUID))))
+
 
 	// サーバー起動ポート
 	addr := fmt.Sprintf(":%s", config.Config.Port)

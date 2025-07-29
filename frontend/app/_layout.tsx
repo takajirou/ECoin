@@ -1,5 +1,3 @@
-// app/_layout.tsx または app/+layout.tsx 相当のファイル（RootLayout）
-
 import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { Stack, usePathname, useRouter } from "expo-router";
 import Header from "../components/Header";
@@ -7,7 +5,7 @@ import Footer from "../components/Footer";
 import { NativeBaseProvider } from "native-base";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { initializeAuth } from "./config";
+import { initializeAuth } from "@/config";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +21,6 @@ export default function RootLayout() {
             const isValid = await initializeAuth();
 
             if (!isValid && !isAuthPage) {
-                // トークン無効かつ非認証ページにいる場合 → loginへ
                 router.replace("/auth/login");
             }
 
@@ -31,7 +28,13 @@ export default function RootLayout() {
         };
 
         checkAuth();
-    }, []);
+    }, []); // 依存配列を空にして初回のみ実行
+
+    useEffect(() => {
+        if (authChecked) {
+            // 必要に応じて追加の処理
+        }
+    }, [pathname, authChecked]);
 
     if (!authChecked && !isAuthPage) {
         return (

@@ -4,15 +4,25 @@ import CustomInput from "@components/CustomInput";
 import CustomButton from "@components/CustomButton";
 import { useState } from "react";
 import useLogin from "hooks/useLogin";
+import { useQueryClient } from "@tanstack/react-query";
 
 const LoginScreen = () => {
+    const queryClient = useQueryClient();
+
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
 
     const loginMutation = useLogin();
-
-    const handleLogin = () => {
-        loginMutation.mutate({ email, password });
+    const handleLogin = async () => {
+        try {
+            await loginMutation.mutateAsync({ email, password });
+            await queryClient.refetchQueries({
+                queryKey: ["fetchProfile"],
+                exact: false,
+            });
+        } catch (e) {
+            console.error("ログイン失敗:", e);
+        }
     };
 
     return (
