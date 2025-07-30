@@ -21,20 +21,14 @@ export default function RootLayout() {
             const isValid = await initializeAuth();
 
             if (!isValid && !isAuthPage) {
-                router.replace("/auth/login");
+                router.replace("/auth/Login");
             }
 
             setAuthChecked(true);
         };
 
         checkAuth();
-    }, []); // 依存配列を空にして初回のみ実行
-
-    useEffect(() => {
-        if (authChecked) {
-            // 必要に応じて追加の処理
-        }
-    }, [pathname, authChecked]);
+    }, []);
 
     if (!authChecked && !isAuthPage) {
         return (
