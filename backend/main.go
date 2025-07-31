@@ -97,6 +97,43 @@ func main() {
 		log.Println("リワードデータの作成が完了しました！")
 	}
 
+	
+	createAccounts := false
+	if createAccounts {
+		log.Println("ユーザーアカウントの作成を開始します...")
+
+		users := []models.User{
+			{
+				Name:     "一般ユーザー",
+				Email:    "eco@example.com",
+				Password: "ts20060219",
+				Coins:    0,
+				Pref:     "東京都",
+				City:     "新宿区",
+				Admin:    false,
+			},
+			{
+				Name:     "管理者ユーザー",
+				Email:    "admin@example.com",
+				Password: "admin0219",
+				Coins:    0,
+				Pref:     "東京都",
+				City:     "千代田区",
+				Admin:    true,
+			},
+		}
+
+		for _, user := range users {
+			err := user.CreateUser()
+			if err != nil {
+				log.Printf("ユーザー %s の作成に失敗: %v\n", user.Email, err)
+			} else {
+				log.Printf("ユーザー作成成功: %s\n", user.Email)
+			}
+		}
+		log.Println("ユーザーアカウントの作成が完了しました！")
+	}
+
 	// 認証が不要なエンドポイント
 	http.HandleFunc("/api/auth/login", controllers.HandleLogin)
 	http.HandleFunc("/api/auth/logout", controllers.HandleLogout)

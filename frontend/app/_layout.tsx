@@ -1,5 +1,5 @@
 import { View, StyleSheet, ActivityIndicator } from "react-native";
-import { Stack, usePathname, useRouter } from "expo-router";
+import { Stack, usePathname, useRouter, Slot } from "expo-router";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { NativeBaseProvider } from "native-base";
@@ -10,25 +10,60 @@ import { initializeAuth } from "@/config";
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
+    const [mounted, setMounted] = useState(false);
+    const [authChecked, setAuthChecked] = useState(false);
+
+    // コンポーネントがマウントされるまで待つ
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // マウントされていない場合は基本的なレイアウトのみ表示
+    if (!mounted) {
+        return (
+            <QueryClientProvider client={queryClient}>
+                <NativeBaseProvider>
+                    <Slot />
+                </NativeBaseProvider>
+            </QueryClientProvider>
+        );
+    }
+
+    return (
+        <QueryClientProvider client={queryClient}>
+            <NativeBaseProvider>
+                <AuthenticatedLayout />
+            </NativeBaseProvider>
+        </QueryClientProvider>
+    );
+}
+
+function AuthenticatedLayout() {
     const pathname = usePathname();
     const router = useRouter();
     const isAuthPage = pathname.startsWith("/auth");
-
     const [authChecked, setAuthChecked] = useState(false);
 
     useEffect(() => {
         const checkAuth = async () => {
-            const isValid = await initializeAuth();
+            try {
+                const isValid = await initializeAuth();
 
-            if (!isValid && !isAuthPage) {
-                router.replace("/auth/Login");
+                if (!isValid && !isAuthPage) {
+                    router.replace("/auth/Login");
+                }
+            } catch (error) {
+                console.error("Auth check failed:", error);
+                if (!isAuthPage) {
+                    router.replace("/auth/Login");
+                }
+            } finally {
+                setAuthChecked(true);
             }
-
-            setAuthChecked(true);
         };
 
         checkAuth();
-    }, []);
+    }, [pathname, isAuthPage, router]);
 
     if (!authChecked && !isAuthPage) {
         return (
@@ -39,29 +74,25 @@ export default function RootLayout() {
     }
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <NativeBaseProvider>
-                <View style={styles.container}>
-                    <View style={styles.content}>
-                        {!isAuthPage && <Header />}
+        <View style={styles.container}>
+            <View style={styles.content}>
+                {!isAuthPage && <Header />}
 
-                        <View style={styles.inner}>
-                            <Stack
-                                screenOptions={{
-                                    headerShown: false,
-                                    contentStyle: {
-                                        backgroundColor: "transparent",
-                                    },
-                                }}
-                            >
-                                <Stack.Screen name="index" />
-                            </Stack>
-                        </View>
-                    </View>
-                    <Footer />
+                <View style={styles.inner}>
+                    <Stack
+                        screenOptions={{
+                            headerShown: false,
+                            contentStyle: {
+                                backgroundColor: "transparent",
+                            },
+                        }}
+                    >
+                        <Stack.Screen name="index" />
+                    </Stack>
                 </View>
-            </NativeBaseProvider>
-        </QueryClientProvider>
+            </View>
+            <Footer />
+        </View>
     );
 }
 
@@ -80,5 +111,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
+        backgroundColor: "#f5f5f5",
     },
 });
