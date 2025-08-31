@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useMissions } from "hooks/useMissions";
-import { upsertStatus } from "libs/upsertStatus";
-import { upsertScore } from "libs/upsertScore";
-import { updateCoin } from "libs/updateCoin";
+import { upsertStats } from "libs/missions/missionStats/upsertStats";
+import { upsertScore } from "libs/score/upsertScore";
+import { updateCoin } from "libs/users/updateCoin";
 import { useQueryClient } from "@tanstack/react-query";
 import useProfile from "hooks/useProfile";
 import { Mission } from "types/mission";
@@ -162,7 +162,7 @@ const Tasks = () => {
 
             // 各ミッションを処理
             for (const missionId of selectedMissions) {
-                await upsertStatus(missionId);
+                await upsertStats(missionId);
                 const mission = missions.find((m) => m.id === missionId);
                 if (mission) totalScore += mission.point;
             }

@@ -1,4 +1,4 @@
-import { apiClient } from "./apiClient";
+import { apiClient } from "../apiClient";
 import { Mission } from "types/mission";
 
 const fetchMissions = async (): Promise<Mission[]> => {

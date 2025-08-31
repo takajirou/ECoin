@@ -1,4 +1,4 @@
-import { apiClient } from "./apiClient";
+import { apiClient } from "../apiClient";
 
 export const updateCoin = async (action: "plus" | "minus", coin: number) => {
     const payload = { coin: coin };

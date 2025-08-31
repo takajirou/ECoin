@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import fetchReward from "libs/fetchRewards";
+import fetchReward from "libs/rewards/fetchRewards";
 
 const useReward = () => {
     return useQuery({
