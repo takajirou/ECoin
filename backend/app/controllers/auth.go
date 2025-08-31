@@ -45,16 +45,16 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	response := models.LoginResponse{
 		Token: token,
 		User: models.User{
-			ID:			user.ID,
-			UUID:  		user.UUID,
-			Name:  		user.Name,
-			Email: 		user.Email,
-			Password: 	user.Password,
-			Coins: 		user.Coins,
-			Pref: 		user.Pref,
-			City: 		user.City,
-			Admin: 		user.Admin,
-			CreatedAt: 	user.CreatedAt,
+			ID:        user.ID,
+			UUID:      user.UUID,
+			Name:      user.Name,
+			Email:     user.Email,
+			Password:  user.Password,
+			Coins:     user.Coins,
+			Pref:      user.Pref,
+			City:      user.City,
+			Admin:     user.Admin,
+			CreatedAt: user.CreatedAt,
 		},
 	}
 
@@ -95,16 +95,16 @@ func HandleMe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	User := models.User{
-		ID:			user.ID,
-		UUID:  		user.UUID,
-		Name:  		user.Name,
-		Email: 		user.Email,
-		Password: 	user.Password,
-		Coins: 		user.Coins,
-		Pref: 		user.Pref,
-		City: 		user.City,
-		Admin: 		user.Admin,
-		CreatedAt: 	user.CreatedAt,
+		ID:        user.ID,
+		UUID:      user.UUID,
+		Name:      user.Name,
+		Email:     user.Email,
+		Password:  user.Password,
+		Coins:     user.Coins,
+		Pref:      user.Pref,
+		City:      user.City,
+		Admin:     user.Admin,
+		CreatedAt: user.CreatedAt,
 	}
 
 	w.Header().Set("Content-Type", "application/json")

@@ -44,10 +44,10 @@ func HandleUserRewards(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "JSONエンコードに失敗しました", http.StatusInternalServerError)
 			return
 		}
-			
-		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-			return
+
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
 	}
-	
+
 }

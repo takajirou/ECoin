@@ -32,7 +32,7 @@ func HandleUserScore(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodPost:
-		err := models.UpsertScoreAllPeriods(claims.UUID,score)
+		err := models.UpsertScoreAllPeriods(claims.UUID, score)
 		if err != nil {
 			http.Error(w, "スコアの更新に失敗しました", http.StatusInternalServerError)
 			return

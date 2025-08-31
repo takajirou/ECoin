@@ -47,7 +47,7 @@ func UpsertMissionStats(userID string, missionID int, periodType, periodValue st
 }
 
 // 当日のミッション達成状況
-func GetTodayUserMissionByUUID(uuid string) (mission_stats MissionStats, err error){
+func GetTodayUserMissionByUUID(uuid string) (mission_stats MissionStats, err error) {
 	mission_stats = MissionStats{}
 
 	cmd := `select id, user_id, mission_id, clear_count, period_type, period_value, updated_at from mission_stats where user_id = ? and updated_at = CURDATE()`
@@ -66,7 +66,7 @@ func GetTodayUserMissionByUUID(uuid string) (mission_stats MissionStats, err err
 }
 
 // 統計用 週/月毎に取得
-func GetTodayMissionStatsByPeriod(uuid string, period_type string, period_value string) (mission_stats MissionStats, err error){
+func GetTodayMissionStatsByPeriod(uuid string, period_type string, period_value string) (mission_stats MissionStats, err error) {
 	mission_stats = MissionStats{}
 
 	cmd := `select id, user_id, mission_id, clear_count, period_type, period_value, updated_at from mission_stats where user_id = ? and period_type = ? and period_value = ?`
@@ -79,7 +79,6 @@ func GetTodayMissionStatsByPeriod(uuid string, period_type string, period_value 
 		&mission_stats.PeriodValue,
 		&mission_stats.UpdatedAt,
 	)
-
 
 	return mission_stats, err
 }
