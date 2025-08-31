@@ -79,9 +79,9 @@ func GetMission() ([]Mission, error) {
 }
 
 // ミッション削除（id指定）
-func (m *Mission) DeleteMission() error {
+func DeleteMission(id int) error {
 	cmd := `DELETE FROM missions WHERE id = ?`
-	_, err := Db.Exec(cmd, m.ID)
+	_, err := Db.Exec(cmd, id)
 	if err != nil {
 		log.Println("DeleteMission error:", err)
 	}
