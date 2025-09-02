@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 func HandleMissions(w http.ResponseWriter, r *http.Request) {
@@ -27,30 +29,34 @@ func HandleMissions(w http.ResponseWriter, r *http.Request) {
 func HandleEditMissions(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPut:
+		// TODO: 更新処理をここに実装
 
 	case http.MethodDelete:
-		var req struct {
-			MissionID int `json:"mission_id"`
-		}
-
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			log.Println("リクエストのデコードに失敗:", err)
-			http.Error(w, "リクエスト形式が正しくありません", http.StatusBadRequest)
+		parts := strings.Split(r.URL.Path, "/")
+		if len(parts) < 4 {
+			http.Error(w, "IDが指定されていません", http.StatusBadRequest)
 			return
 		}
 
-		if err := models.DeleteMission(req.MissionID); err != nil {
+		id, err := strconv.Atoi(parts[len(parts)-1])
+		if err != nil {
+			http.Error(w, "不正なIDです", http.StatusBadRequest)
+			return
+		}
+
+		if err := models.DeleteMission(id); err != nil {
 			log.Println("DeleteMission エラー:", err)
 			http.Error(w, "ミッションの削除に失敗しました。", http.StatusInternalServerError)
 			return
 		}
 
-		// 削除成功した場合、削除したIDを返す（任意）
-		resp := map[string]int{"deleted_id": req.MissionID}
+		resp := map[string]int{"deleted_id": id}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(resp)
 
 	case http.MethodPost:
+		// TODO: 新規作成処理をここに実装
+
 	default:
 		http.Error(w, "許可されていないメソッドです", http.StatusMethodNotAllowed)
 	}

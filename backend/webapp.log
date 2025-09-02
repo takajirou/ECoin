@@ -252,3 +252,8 @@
 2025/07/31 13:28:40 main.go:172: Server started at http://localhost:8080
 2025/08/31 02:33:13 main.go:172: Server started at http://localhost:8080
 2025/08/31 15:59:20 main.go:172: Server started at http://localhost:8080
+2025/09/02 15:04:01 main.go:170: Server started at http://localhost:8080
+2025/09/02 15:04:08 mission_controller.go:37: リクエストのデコードに失敗: EOF
+2025/09/02 15:12:38 mission_controller.go:37: リクエストのデコードに失敗: EOF
+2025/09/02 15:19:53 mission_controller.go:37: リクエストのデコードに失敗: EOF
+2025/09/02 15:20:29 main.go:170: Server started at http://localhost:8080
