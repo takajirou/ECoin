@@ -5,6 +5,7 @@ import { upsertScore } from "libs/score/upsertScore";
 import { updateCoin } from "libs/users/updateCoin";
 import { useQueryClient } from "@tanstack/react-query";
 import { deleteMissions } from "libs/missions/deleteMission";
+import { updateMission } from "libs/missions/updateMission";
 import useProfile from "hooks/useProfile";
 import { Mission } from "types/mission";
 import TaskCard from "@components/tasks/TaskCard";
@@ -20,6 +21,7 @@ import {
     Alert,
     Modal,
     TextInput,
+    Switch,
 } from "react-native";
 
 const Tasks = () => {
@@ -31,12 +33,16 @@ const Tasks = () => {
     const [missionTitle, setMissionTitle] = useState("");
     const [missionDescription, setMissionDescription] = useState("");
     const [missionPoint, setMissionPoint] = useState("");
+    const [missionDifficulty, setMissionDifficulty] = useState("普通");
+    const [isPublic, setIsPublic] = useState(true);
 
     const queryClient = useQueryClient();
     const { data: profile, isLoading: isProfileLoading } = useProfile();
     const isAdmin = profile?.admin == 1;
     const { data: missions = [], isLoading, error } = useMissions();
     const [selectedMissions, setSelectedMissions] = useState<number[]>([]);
+
+    const difficultyOptions = ["簡単", "普通", "難しい"];
 
     const handleMissionPress = (mission: Mission) => {
         setSelectedMissions((prev) => {
@@ -60,12 +66,16 @@ const Tasks = () => {
             setMissionTitle(mission.title || "");
             setMissionDescription(mission.description || "");
             setMissionPoint(mission.point?.toString() || "");
+            setMissionDifficulty(mission.difficulty || "普通");
+            setIsPublic(mission.active !== false);
         } else {
             // 新規作成の場合
             setEditingMission(null);
             setMissionTitle("");
             setMissionDescription("");
             setMissionPoint("");
+            setMissionDifficulty("普通");
+            setIsPublic(true);
         }
         setIsEditing(true);
     };
@@ -80,12 +90,17 @@ const Tasks = () => {
             const missionData = {
                 title: missionTitle.trim(),
                 description: missionDescription.trim(),
+                difficulty: missionDifficulty,
                 point: parseInt(missionPoint),
+                require_proof: false,
+                active: isPublic,
             };
 
             if (editingMission) {
-                // 既存ミッションの更新
-                // await updateMission(editingMission.id, missionData);
+                await updateMission({
+                    id: editingMission.id,
+                    ...missionData,
+                });
                 console.log("ミッション更新:", {
                     id: editingMission.id,
                     ...missionData,
@@ -149,6 +164,8 @@ const Tasks = () => {
         setMissionTitle("");
         setMissionDescription("");
         setMissionPoint("");
+        setMissionDifficulty("普通");
+        setIsPublic(true);
     };
 
     // 選択されたミッションを送信する関数
@@ -351,6 +368,60 @@ const Tasks = () => {
                             />
                         </View>
 
+                        {/* 難易度選択 - 新規追加 */}
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.inputLabel}>難易度</Text>
+                            <View style={styles.difficultyContainer}>
+                                {difficultyOptions.map((difficulty) => (
+                                    <TouchableOpacity
+                                        key={difficulty}
+                                        style={[
+                                            styles.difficultyOption,
+                                            missionDifficulty === difficulty &&
+                                                styles.selectedDifficultyOption,
+                                        ]}
+                                        onPress={() =>
+                                            setMissionDifficulty(difficulty)
+                                        }
+                                    >
+                                        <Text
+                                            style={[
+                                                styles.difficultyText,
+                                                missionDifficulty ===
+                                                    difficulty &&
+                                                    styles.selectedDifficultyText,
+                                            ]}
+                                        >
+                                            {difficulty}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </View>
+
+                        {/* 公開設定トグル - 新規追加 */}
+                        <View style={styles.inputContainer}>
+                            <View style={styles.switchContainer}>
+                                <Text style={styles.inputLabel}>公開設定</Text>
+                                <View style={styles.switchRow}>
+                                    <Text style={styles.switchLabel}>
+                                        {isPublic ? "公開" : "非公開"}
+                                    </Text>
+                                    <Switch
+                                        value={isPublic}
+                                        onValueChange={setIsPublic}
+                                        trackColor={{
+                                            false: "#767577",
+                                            true: "#4CAF50",
+                                        }}
+                                        thumbColor={
+                                            isPublic ? "#ffffff" : "#f4f3f4"
+                                        }
+                                    />
+                                </View>
+                            </View>
+                        </View>
+
                         <View style={styles.modalButtons}>
                             <TouchableOpacity
                                 style={styles.cancelButton}
@@ -495,6 +566,7 @@ const styles = StyleSheet.create({
         margin: 20,
         maxWidth: 400,
         width: "90%",
+        maxHeight: "80%",
     },
     modalTitle: {
         fontSize: 18,
@@ -524,6 +596,50 @@ const styles = StyleSheet.create({
     textAreaInput: {
         height: 80,
         textAlignVertical: "top",
+    },
+    // 難易度選択のスタイル - 新規追加
+    difficultyContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
+    difficultyOption: {
+        flex: 1,
+        paddingVertical: 12,
+        paddingHorizontal: 8,
+        borderWidth: 1,
+        borderColor: "#ddd",
+        borderRadius: 8,
+        marginHorizontal: 4,
+        alignItems: "center",
+        backgroundColor: "#f9f9f9",
+    },
+    selectedDifficultyOption: {
+        backgroundColor: "#4CAF50",
+        borderColor: "#4CAF50",
+    },
+    difficultyText: {
+        fontSize: 14,
+        color: "#333",
+        fontWeight: "500",
+    },
+    selectedDifficultyText: {
+        color: "white",
+        fontWeight: "bold",
+    },
+    // 公開設定トグルのスタイル - 新規追加
+    switchContainer: {
+        flexDirection: "column",
+    },
+    switchRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingVertical: 8,
+    },
+    switchLabel: {
+        fontSize: 16,
+        color: "#333",
+        fontWeight: "500",
     },
     modalButtons: {
         flexDirection: "row",
