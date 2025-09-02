@@ -9,9 +9,7 @@ interface CreateMissionRequest {
     active?: boolean;
 }
 
-const createMission = async (params: CreateMissionRequest) => {
+export const createMission = async (params: CreateMissionRequest) => {
     const res = await apiClient.post("/admin/missions", params);
     return res.data;
 };
-
-export default createMission;
