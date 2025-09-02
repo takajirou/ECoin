@@ -4,6 +4,7 @@ import { upsertStats } from "libs/missions/missionStats/upsertStats";
 import { upsertScore } from "libs/score/upsertScore";
 import { updateCoin } from "libs/users/updateCoin";
 import { useQueryClient } from "@tanstack/react-query";
+import { deleteMissions } from "libs/missions/deleteMission";
 import useProfile from "hooks/useProfile";
 import { Mission } from "types/mission";
 import TaskCard from "@components/tasks/TaskCard";
@@ -125,8 +126,7 @@ const Tasks = () => {
                 style: "destructive",
                 onPress: async () => {
                     try {
-                        // await deleteMission(mission.id);
-                        console.log("ミッション削除:", mission.id);
+                        await deleteMissions(mission.id);
 
                         await queryClient.refetchQueries({
                             queryKey: ["missions"],
