@@ -36,6 +36,7 @@ const Tasks = () => {
     const [missionPoint, setMissionPoint] = useState("");
     const [missionDifficulty, setMissionDifficulty] = useState("普通");
     const [isActive, setIsActive] = useState(true);
+    const [savedPoint, setSavedPoint] = useState("");
 
     const queryClient = useQueryClient();
     const { data: profile, isLoading: isProfileLoading } = useProfile();
@@ -85,6 +86,7 @@ const Tasks = () => {
             setMissionTitle(mission.title || "");
             setMissionDescription(mission.description || "");
             setMissionPoint(mission.point?.toString() || "");
+            setSavedPoint(mission.saved_amount.toString() || "");
             setMissionDifficulty(difficultyMap[mission.difficulty] || "普通");
             setIsActive(mission.active !== false);
         } else {
@@ -93,6 +95,7 @@ const Tasks = () => {
             setMissionTitle("");
             setMissionDescription("");
             setMissionPoint("");
+            setSavedPoint("");
             setMissionDifficulty("普通");
             setIsActive(true);
         }
@@ -117,7 +120,8 @@ const Tasks = () => {
                 description: missionDescription.trim(),
                 difficulty: difficultyMap[missionDifficulty] || "medium",
                 point: parseInt(missionPoint),
-                require_proof: false, // デフォルト値
+                saved_amount: parseInt(savedPoint),
+                require_proof: false,
                 active: isActive,
             };
 
@@ -393,7 +397,18 @@ const Tasks = () => {
                             />
                         </View>
 
-                        {/* 難易度選択 - 新規追加 */}
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.inputLabel}>節約額目安 *</Text>
+                            <TextInput
+                                style={styles.textInput}
+                                value={savedPoint}
+                                onChangeText={setSavedPoint}
+                                placeholder="節約額目安を入力"
+                                keyboardType="numeric"
+                                maxLength={10}
+                            />
+                        </View>
+
                         <View style={styles.inputContainer}>
                             <Text style={styles.inputLabel}>難易度</Text>
                             <View style={styles.difficultyContainer}>
@@ -424,7 +439,6 @@ const Tasks = () => {
                             </View>
                         </View>
 
-                        {/* 公開設定トグル - 新規追加 */}
                         <View style={styles.inputContainer}>
                             <View style={styles.switchContainer}>
                                 <Text style={styles.inputLabel}>公開設定</Text>
