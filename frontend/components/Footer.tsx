@@ -28,7 +28,7 @@ const Footer: React.FC = () => {
             </TouchableOpacity>
             <TouchableOpacity
                 style={styles.NavBtnWrap}
-                onPress={() => router.push("/")}
+                onPress={() => router.push("/option")}
             >
                 <Ionicons name="settings-sharp" size={28} color="#898888" />
                 <Text style={styles.Text}>設定</Text>
