@@ -3,413 +3,237 @@ import {
     View,
     Text,
     StyleSheet,
+    ScrollView,
     TouchableOpacity,
     Modal,
-    ScrollView,
-    Animated,
 } from "react-native";
 
-// ダミー型定義
-type Mission = {
-    id: number;
-    title: string;
-    description: string;
-    difficulty: "easy" | "medium" | "hard";
-    point: number;
-    active?: boolean;
-};
-
-// ダミーデータ
-const DUMMY_MISSIONS: Mission[] = [
-    {
-        id: 1,
-        title: "マイボトルを持参する",
-        description: "外出時にマイボトルを持って行くことでペットボトル削減",
-        difficulty: "easy",
-        point: 10,
-        active: true,
-    },
-    {
-        id: 2,
-        title: "電気をこまめに消す",
-        description: "部屋を出るときに電気を消す習慣をつける",
-        difficulty: "medium",
-        point: 20,
-        active: true,
-    },
-    {
-        id: 3,
-        title: "自転車で通勤/通学する",
-        description: "週に1回は車を使わず自転車で移動",
-        difficulty: "hard",
-        point: 50,
-        active: true,
-    },
+const DUMMY_MISSIONS = [
+    { id: 1, title: "電気をこまめに消す", point: 10, difficulty: "easy" },
+    { id: 2, title: "自転車で通勤", point: 20, difficulty: "medium" },
+    { id: 3, title: "マイバッグを持参", point: 15, difficulty: "easy" },
 ];
 
-const TopDashboard: React.FC = () => {
-    const [isEventOpen, setIsEventOpen] = useState(false);
-    const [selectedMission] = useState<Mission | null>(DUMMY_MISSIONS[0]);
-    const [streak] = useState(5);
-    const [monthlySaving] = useState(1280); // 円
-    const [co2Saved] = useState(12.4); // kg
-    const [rankingPosition] = useState(42);
-    const [regionComparison] = useState({ myPref: 12.4, prefectureAvg: 9.1 });
+const TopDashboard = () => {
+    const [period, setPeriod] = useState<"week" | "month">("week");
 
-    const progressAnim = new Animated.Value(co2Saved / 50); // 50kgを目標に
+    // ダミーデータ
+    const co2Saved = period === "week" ? 12.5 : 50; // kg
+    const monthlySaving = period === "week" ? 1500 : 6000; // 円
+    const consecutiveDays = 7;
+
+    const [isEventModalVisible, setEventModalVisible] = useState(false);
+
+    const togglePeriod = () => {
+        setPeriod(period === "week" ? "month" : "week");
+    };
 
     return (
-        <View style={styles.screen}>
-            <ScrollView contentContainerStyle={styles.container}>
-                {/* ヘッダー */}
-                <View style={styles.header}>
-                    <Text style={styles.headerTitle}>エコダッシュボード</Text>
-                    <View style={styles.headerRow}>
-                        <TouchableOpacity
-                            style={styles.headerButton}
-                            onPress={() => setIsEventOpen(true)}
-                        >
-                            <Text style={styles.headerButtonText}>
-                                イベント
-                            </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.headerButton, styles.primaryBtn]}
-                        >
-                            <Text
-                                style={[
-                                    styles.headerButtonText,
-                                    styles.primaryText,
-                                ]}
-                            >
-                                ランキング
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-
-                {/* 上位統計カード群 */}
-                <View style={styles.statRow}>
-                    <View style={styles.statCard}>
-                        <Text style={styles.statLabel}>今月の節約額</Text>
-                        <Text style={styles.statValue}>
-                            ¥{monthlySaving.toLocaleString()}
-                        </Text>
-                        <Text style={styles.small}>この金額は目安です</Text>
-                    </View>
-
-                    <View style={styles.statCard}>
-                        <Text style={styles.statLabel}>連続達成日数</Text>
-                        <Text style={styles.statValue}>{streak}日</Text>
-                        <Text style={styles.small}>連続記録を伸ばそう！</Text>
-                    </View>
-                </View>
-
-                {/* CO2可視化カード */}
-                <View style={styles.co2Card}>
-                    <View style={styles.co2Left}>
-                        <Text style={styles.co2Label}>累計CO₂削減量</Text>
-                        <Text style={styles.co2Value}>{co2Saved} kg</Text>
-                        <Text style={styles.small}>目標: 50 kg</Text>
-
-                        <View style={styles.progressBg}>
-                            <Animated.View
-                                style={[
-                                    styles.progressFg,
-                                    {
-                                        width: `${Math.min((co2Saved / 50) * 100, 100)}%`,
-                                    },
-                                ]}
-                            />
-                        </View>
-                    </View>
-
-                    <View style={styles.co2Right}>
-                        <Text style={styles.co2Mini}>地域平均 vs あなた</Text>
-                        <View style={styles.compareRow}>
-                            <View style={styles.compareItem}>
-                                <Text style={styles.compareLabel}>あなた</Text>
-                                <Text style={styles.compareValue}>
-                                    {regionComparison.myPref}kg
-                                </Text>
-                            </View>
-                            <View style={styles.compareItem}>
-                                <Text style={styles.compareLabel}>県平均</Text>
-                                <Text style={styles.compareValue}>
-                                    {regionComparison.prefectureAvg}kg
-                                </Text>
-                            </View>
-                        </View>
-                        <Text style={styles.small}>
-                            県別バトルに参加してみよう
-                        </Text>
-                    </View>
-                </View>
-
-                {/* 今日のおすすめミッション */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>
-                        今日のおすすめミッション
-                    </Text>
-                    {selectedMission ? (
-                        <TouchableOpacity style={styles.missionCard}>
-                            <View style={styles.missionLeft}>
-                                <Text style={styles.missionTitle}>
-                                    {selectedMission.title}
-                                </Text>
-                                <Text style={styles.missionDesc}>
-                                    {selectedMission.description}
-                                </Text>
-                                <Text style={styles.missionMeta}>
-                                    難易度:{" "}
-                                    {mapDifficultyToJapanese(
-                                        selectedMission.difficulty
-                                    )}{" "}
-                                    ・ {selectedMission.point}pt
-                                </Text>
-                            </View>
-                            <View style={styles.missionRight}>
-                                <TouchableOpacity style={styles.actionBtn}>
-                                    <Text style={styles.actionBtnText}>
-                                        挑戦する
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                        </TouchableOpacity>
-                    ) : (
-                        <Text style={styles.small}>
-                            今日のおすすめはありません
-                        </Text>
-                    )}
-                </View>
-
-                {/* 最近の実績 / お知らせ */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>最近の実績</Text>
-                    <View style={styles.activityItem}>
-                        <Text style={styles.activityText}>
-                            ・
-                            昨日「マイボトルを持参する」を達成しました（+10pt）
-                        </Text>
-                    </View>
-                    <View style={styles.sectionTitleTopSpace} />
-                    <Text style={styles.sectionTitle}>豆知識</Text>
-                    <Text style={styles.small}>
-                        マイボトルを1年使うと、ペットボトル約120本分を削減できます。
-                    </Text>
-                </View>
-
-                {/* フッターナビの余白 */}
-                <View style={{ height: 120 }} />
-            </ScrollView>
-
-            {/* 画面右下にイベントバッジ */}
-            <View style={styles.fabRow} pointerEvents="box-none">
+        <ScrollView style={styles.container}>
+            {/* 節約額切替 */}
+            <View style={styles.periodSwitchContainer}>
                 <TouchableOpacity
-                    style={styles.fab}
-                    onPress={() => setIsEventOpen(true)}
+                    onPress={togglePeriod}
+                    style={styles.periodButton}
                 >
-                    <Text style={styles.fabText}>イベントを見る</Text>
+                    <Text style={styles.periodButtonText}>
+                        {period === "week" ? "今週" : "今月"}の統計に切替
+                    </Text>
                 </TouchableOpacity>
             </View>
 
-            {/* イベントモーダル */}
-            <Modal visible={isEventOpen} transparent animationType="slide">
-                <View style={styles.modalOverlayCenter}>
-                    <View style={styles.eventModal}>
-                        <Text style={styles.eventTitle}>期間限定イベント</Text>
-                        <Text style={styles.small}>
-                            今週は「プラスチック削減チャレンジ」！参加してボーナスポイントをゲットしよう。
-                        </Text>
+            {/* 節約額表示 */}
+            <View style={styles.savingContainer}>
+                <Text style={styles.savingTitle}>節約金額</Text>
+                <Text style={styles.savingValue}>{monthlySaving} 円</Text>
+            </View>
 
-                        <View style={styles.modalButtonsRow}>
-                            <TouchableOpacity
-                                style={[styles.modalBtn, styles.cancelModalBtn]}
-                                onPress={() => setIsEventOpen(false)}
-                            >
-                                <Text style={styles.modalBtnText}>閉じる</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[
-                                    styles.modalBtn,
-                                    styles.primaryModalBtn,
-                                ]}
-                            >
-                                <Text
-                                    style={[
-                                        styles.modalBtnText,
-                                        styles.primaryText,
-                                    ]}
-                                >
-                                    参加する
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
+            {/* CO2削減量 */}
+            <View style={styles.co2Container}>
+                <Text style={styles.co2Title}>CO₂削減量</Text>
+                <Text style={styles.co2Value}>{co2Saved} kg</Text>
+            </View>
+
+            {/* 今日のおすすめミッション */}
+            <View style={styles.missionContainer}>
+                <Text style={styles.sectionTitle}>
+                    今日のおすすめミッション
+                </Text>
+                {DUMMY_MISSIONS.slice(0, 1).map((mission) => (
+                    <View key={mission.id} style={styles.missionCard}>
+                        <Text style={styles.missionTitle}>{mission.title}</Text>
+                        <Text style={styles.missionPoint}>
+                            {mission.point} pt
+                        </Text>
+                    </View>
+                ))}
+            </View>
+
+            {/* ランキングボタン */}
+            <TouchableOpacity style={styles.button} onPress={() => {}}>
+                <Text style={styles.buttonText}>ランキングを見る</Text>
+            </TouchableOpacity>
+
+            {/* イベントボタン */}
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => setEventModalVisible(true)}
+            >
+                <Text style={styles.buttonText}>イベントを確認</Text>
+            </TouchableOpacity>
+
+            {/* イベントモーダル */}
+            <Modal
+                visible={isEventModalVisible}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setEventModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalTitle}>イベント詳細</Text>
+                        <Text style={styles.modalContent}>
+                            ここにイベント内容を表示します（ダミーデータ）
+                        </Text>
+                        <TouchableOpacity
+                            style={styles.closeButton}
+                            onPress={() => setEventModalVisible(false)}
+                        >
+                            <Text style={styles.closeButtonText}>閉じる</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
-        </View>
+        </ScrollView>
     );
 };
 
-export default TopDashboard;
-
-// ヘルパー
-function mapDifficultyToJapanese(d: string) {
-    switch (d) {
-        case "easy":
-            return "簡単";
-        case "medium":
-            return "普通";
-        case "hard":
-            return "難しい";
-        default:
-            return "普通";
-    }
-}
-
 const styles = StyleSheet.create({
-    screen: { flex: 1, backgroundColor: "#f5f7fb" },
-    container: { padding: 16, paddingBottom: 40 },
-    header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 12,
-    },
-    headerTitle: { fontSize: 22, fontWeight: "700", color: "#1b5e20" },
-    headerRow: { flexDirection: "row" },
-    headerButton: {
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 8,
-        marginLeft: 8,
-        borderWidth: 1,
-        borderColor: "#d0d7d5",
-    },
-    headerButtonText: { fontSize: 14 },
-    primaryBtn: { backgroundColor: "#1b5e20", borderWidth: 0 },
-    primaryText: { color: "#fff" },
-
-    statRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 12,
-    },
-    statCard: {
+    container: {
         flex: 1,
-        backgroundColor: "#fff",
-        padding: 12,
-        borderRadius: 10,
-        marginRight: 8,
-        shadowColor: "#000",
-        shadowOpacity: 0.05,
-        elevation: 2,
+        backgroundColor: "#f5f5f5",
+        padding: 16,
     },
-    statLabel: { fontSize: 12, color: "#666" },
-    statValue: { fontSize: 18, fontWeight: "700", marginTop: 8, color: "#333" },
-    small: { fontSize: 12, color: "#666", marginTop: 6 },
-
-    co2Card: {
-        flexDirection: "row",
+    periodSwitchContainer: {
+        marginBottom: 16,
+        alignItems: "center",
+    },
+    periodButton: {
+        backgroundColor: "#4CAF50",
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+    },
+    periodButtonText: {
+        color: "#fff",
+        fontWeight: "bold",
+    },
+    savingContainer: {
         backgroundColor: "#fff",
-        padding: 12,
         borderRadius: 12,
-        marginBottom: 12,
+        padding: 16,
+        marginBottom: 16,
+        alignItems: "center",
     },
-    co2Left: { flex: 1 },
-    co2Right: { width: 140, paddingLeft: 12, justifyContent: "center" },
-    co2Label: { fontSize: 13, color: "#666" },
-    co2Value: {
-        fontSize: 20,
-        fontWeight: "800",
-        color: "#2e7d32",
-        marginTop: 6,
-    },
-    co2Mini: { fontSize: 12, color: "#666", marginBottom: 6 },
-    progressBg: {
-        height: 12,
-        backgroundColor: "#edf7ed",
-        borderRadius: 8,
-        marginTop: 8,
-        overflow: "hidden",
-    },
-    progressFg: { height: 12, backgroundColor: "#2e7d32" },
-    compareRow: { flexDirection: "row", justifyContent: "space-between" },
-    compareItem: { alignItems: "center" },
-    compareLabel: { fontSize: 12, color: "#444" },
-    compareValue: { fontSize: 16, fontWeight: "700", color: "#333" },
-
-    section: {
-        marginBottom: 14,
-        backgroundColor: "#fff",
-        padding: 12,
-        borderRadius: 10,
-    },
-    sectionTitle: {
+    savingTitle: {
         fontSize: 16,
-        fontWeight: "700",
-        marginBottom: 8,
         color: "#333",
     },
-    sectionTitleTopSpace: { height: 8 },
-
-    missionCard: {
-        flexDirection: "row",
-        justifyContent: "space-between",
+    savingValue: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#4CAF50",
+        marginTop: 8,
+    },
+    co2Container: {
+        backgroundColor: "#fff",
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 16,
         alignItems: "center",
     },
-    missionLeft: { flex: 1, paddingRight: 12 },
-    missionTitle: { fontSize: 15, fontWeight: "700", color: "#1b5e20" },
-    missionDesc: { fontSize: 13, color: "#666", marginTop: 6 },
-    missionMeta: { fontSize: 12, color: "#999", marginTop: 8 },
-    missionRight: { width: 100, alignItems: "flex-end" },
-    actionBtn: {
-        backgroundColor: "#1b5e20",
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 8,
+    co2Title: {
+        fontSize: 16,
+        color: "#333",
     },
-    actionBtnText: { color: "#fff", fontWeight: "700" },
-
-    activityItem: { paddingVertical: 8 },
-    activityText: { color: "#444" },
-
-    fabRow: { position: "absolute", right: 16, bottom: 18 },
-    fab: {
-        backgroundColor: "#ff9800",
-        paddingHorizontal: 14,
-        paddingVertical: 10,
-        borderRadius: 24,
-        elevation: 6,
+    co2Value: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#2196F3",
+        marginTop: 8,
     },
-    fabText: { color: "#fff", fontWeight: "700" },
-
-    modalOverlayCenter: {
+    missionContainer: {
+        marginBottom: 16,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "#333",
+        marginBottom: 8,
+    },
+    missionCard: {
+        backgroundColor: "#fff",
+        borderRadius: 12,
+        padding: 12,
+        marginBottom: 8,
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
+    missionTitle: {
+        fontSize: 16,
+        color: "#333",
+    },
+    missionPoint: {
+        fontSize: 16,
+        color: "#4CAF50",
+        fontWeight: "bold",
+    },
+    button: {
+        backgroundColor: "#4CAF50",
+        paddingVertical: 12,
+        borderRadius: 12,
+        marginBottom: 12,
+        alignItems: "center",
+    },
+    buttonText: {
+        color: "#fff",
+        fontWeight: "bold",
+        fontSize: 16,
+    },
+    modalOverlay: {
         flex: 1,
-        backgroundColor: "rgba(0,0,0,0.4)",
+        backgroundColor: "rgba(0,0,0,0.5)",
         justifyContent: "center",
         alignItems: "center",
     },
-    eventModal: {
-        width: "85%",
+    modalContainer: {
         backgroundColor: "#fff",
-        padding: 16,
+        borderRadius: 12,
+        padding: 20,
+        width: "80%",
+        alignItems: "center",
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        marginBottom: 12,
+    },
+    modalContent: {
+        fontSize: 16,
+        color: "#333",
+        marginBottom: 20,
+        textAlign: "center",
+    },
+    closeButton: {
+        backgroundColor: "#4CAF50",
+        paddingVertical: 8,
+        paddingHorizontal: 16,
         borderRadius: 12,
     },
-    eventTitle: { fontSize: 18, fontWeight: "800", marginBottom: 8 },
-    modalButtonsRow: {
-        flexDirection: "row",
-        justifyContent: "flex-end",
-        marginTop: 12,
+    closeButtonText: {
+        color: "#fff",
+        fontWeight: "bold",
     },
-    modalBtn: {
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 8,
-        marginLeft: 8,
-    },
-    cancelModalBtn: { backgroundColor: "#e0e0e0" },
-    primaryModalBtn: { backgroundColor: "#2e7d32" },
-    modalBtnText: { color: "#fff", fontWeight: "700" },
 });
+
+export default TopDashboard;
