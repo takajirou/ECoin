@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import postLogin from "libs/postLogin";
+import postLogin from "libs/auth/postLogin";
 import { setToken } from "@/config";
 import { router } from "expo-router";
 

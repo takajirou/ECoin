@@ -3,7 +3,10 @@ package controllers
 import (
 	"ECoin/app/models"
 	"encoding/json"
+	"log"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 func HandleMissions(w http.ResponseWriter, r *http.Request) {
@@ -23,13 +26,38 @@ func HandleMissions(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HandleEditMissions(w http.ResponseWriter,r *http.Request){
+func HandleEditMissions(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-		case http.MethodPut:
+	case http.MethodPut:
+		// TODO: 更新処理をここに実装
 
+	case http.MethodDelete:
+		parts := strings.Split(r.URL.Path, "/")
+		if len(parts) < 4 {
+			http.Error(w, "IDが指定されていません", http.StatusBadRequest)
+			return
+		}
 
-		case http.MethodDelete:
+		id, err := strconv.Atoi(parts[len(parts)-1])
+		if err != nil {
+			http.Error(w, "不正なIDです", http.StatusBadRequest)
+			return
+		}
 
-		case http.MethodPost:
+		if err := models.DeleteMission(id); err != nil {
+			log.Println("DeleteMission エラー:", err)
+			http.Error(w, "ミッションの削除に失敗しました。", http.StatusInternalServerError)
+			return
+		}
+
+		resp := map[string]int{"deleted_id": id}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
+
+	case http.MethodPost:
+		// TODO: 新規作成処理をここに実装
+
+	default:
+		http.Error(w, "許可されていないメソッドです", http.StatusMethodNotAllowed)
 	}
 }

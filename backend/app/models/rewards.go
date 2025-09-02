@@ -40,7 +40,6 @@ func (r *Reward) CreateReward() (err error) {
 	return nil
 }
 
-
 func GetRewards() (rewards []Reward, err error) {
 	rewards = []Reward{}
 

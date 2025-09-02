@@ -13,8 +13,8 @@ import useReward from "hooks/useRewards";
 import { RewardResponse } from "types/rewards";
 import { useState } from "react";
 import ExchangeModal from "@components/exchange/ExchangeModal";
-import postUserReward from "libs/postUserReward";
-import { updateCoin } from "libs/updateCoin";
+import postUserReward from "libs/users/userRewards/postUserReward";
+import { updateCoin } from "libs/users/updateCoin";
 import { useQueryClient } from "@tanstack/react-query";
 
 const images: { [key: string]: any } = {

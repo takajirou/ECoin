@@ -97,7 +97,6 @@ func main() {
 		log.Println("リワードデータの作成が完了しました！")
 	}
 
-	
 	createAccounts := false
 	if createAccounts {
 		log.Println("ユーザーアカウントの作成を開始します...")
@@ -164,8 +163,7 @@ func main() {
 	http.Handle("/api/admin/missions/",
 		middleware.JWTMiddleware(
 			middleware.AdminMiddleware(
-				http.HandlerFunc(controllers.HandleUserByUUID))))
-
+				http.HandlerFunc(controllers.HandleEditMissions))))
 
 	// サーバー起動ポート
 	addr := fmt.Sprintf(":%s", config.Config.Port)

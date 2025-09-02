@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import fetchMissions from "libs/fetchMissions";
+import fetchMissions from "libs/missions/fetchMissions";
 
 export const useMissions = () => {
     return useQuery({

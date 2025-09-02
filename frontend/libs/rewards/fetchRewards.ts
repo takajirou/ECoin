@@ -1,4 +1,4 @@
-import { apiClient } from "./apiClient";
+import { apiClient } from "../apiClient";
 import { RewardResponse } from "types/rewards";
 
 const fetchReward = async () => {

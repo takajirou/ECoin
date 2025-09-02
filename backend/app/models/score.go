@@ -26,7 +26,6 @@ func GetScoreByUserPeriod(userID, periodType, periodValue string) (Score, error)
 	return s, err
 }
 
-
 // アップサート（存在すれば更新、なければ挿入）
 func UpsertScoreAllPeriods(userID string, score int) error {
 	periods := []struct {
@@ -46,7 +45,7 @@ func UpsertScoreAllPeriods(userID string, score int) error {
 	return nil
 }
 
-func UpsertScore(userID string, score int, periodType, periodValue string )error {
+func UpsertScore(userID string, score int, periodType, periodValue string) error {
 	cmd := `
 	INSERT INTO score (
 		user_id, earn_coin, period_type, period_value, created_at

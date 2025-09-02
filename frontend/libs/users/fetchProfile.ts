@@ -1,4 +1,4 @@
-import { apiClient } from "./apiClient";
+import { apiClient } from "../apiClient";
 import { profileResponse } from "types/profile";
 
 const fetchProfile = async () => {

@@ -6,19 +6,19 @@ import (
 )
 
 type Event struct {
-	ID 				int
-	RequestUser 	string
-	Address 		string
-	Title 			string
-	Description 	string
-	Active 			bool
-	MeetingTime 	time.Time
-	EndTime 		time.Time
-	Point 			int
-	Pref			string
-	City			string
-	Capacity 		int
-	RequestedAt 	time.Time
+	ID          int
+	RequestUser string
+	Address     string
+	Title       string
+	Description string
+	Active      bool
+	MeetingTime time.Time
+	EndTime     time.Time
+	Point       int
+	Pref        string
+	City        string
+	Capacity    int
+	RequestedAt time.Time
 }
 
 func (e *Event) CreateEvent(uuid string) (err error) {
@@ -58,7 +58,7 @@ func (e *Event) CreateEvent(uuid string) (err error) {
 	return err
 }
 
-func GetNoneActiveEvents() (event Event, err error){
+func GetNoneActiveEvents() (event Event, err error) {
 	event = Event{}
 
 	cmd := `select id, request_user, title, description, address, active, meeting_time, end_time, point, pref, city, capacity, requested_at from events where active = 0`
@@ -81,7 +81,7 @@ func GetNoneActiveEvents() (event Event, err error){
 
 	return event, err
 }
-func GetEventsByEventID(event_id int) (event Event, err error){
+func GetEventsByEventID(event_id int) (event Event, err error) {
 	event = Event{}
 
 	cmd := `select id, request_user, title, description, address, active, meeting_time, end_time, point, pref, city, capacity, requested_at from events where active = 1 and id = ?`
