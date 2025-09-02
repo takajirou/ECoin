@@ -34,7 +34,7 @@ const Tasks = () => {
     const [missionDescription, setMissionDescription] = useState("");
     const [missionPoint, setMissionPoint] = useState("");
     const [missionDifficulty, setMissionDifficulty] = useState("普通");
-    const [isPublic, setIsPublic] = useState(true);
+    const [isActive, setIsActive] = useState(true);
 
     const queryClient = useQueryClient();
     const { data: profile, isLoading: isProfileLoading } = useProfile();
@@ -67,7 +67,7 @@ const Tasks = () => {
             setMissionDescription(mission.description || "");
             setMissionPoint(mission.point?.toString() || "");
             setMissionDifficulty(mission.difficulty || "普通");
-            setIsPublic(mission.active !== false);
+            setIsActive(mission.active !== false);
         } else {
             // 新規作成の場合
             setEditingMission(null);
@@ -75,7 +75,7 @@ const Tasks = () => {
             setMissionDescription("");
             setMissionPoint("");
             setMissionDifficulty("普通");
-            setIsPublic(true);
+            setIsActive(true);
         }
         setIsEditing(true);
     };
@@ -92,11 +92,12 @@ const Tasks = () => {
                 description: missionDescription.trim(),
                 difficulty: missionDifficulty,
                 point: parseInt(missionPoint),
-                require_proof: false,
-                active: isPublic,
+                require_proof: false, // デフォルト値
+                active: isActive,
             };
 
             if (editingMission) {
+                // 既存ミッションの更新
                 await updateMission({
                     id: editingMission.id,
                     ...missionData,
@@ -165,12 +166,12 @@ const Tasks = () => {
         setMissionDescription("");
         setMissionPoint("");
         setMissionDifficulty("普通");
-        setIsPublic(true);
+        setIsActive(true);
     };
 
     // 選択されたミッションを送信する関数
     const handleSubmitMissions = async () => {
-        if (isSubmitting) return; // 重複実行を防ぐ
+        if (isSubmitting) return;
 
         setIsSubmitting(true);
 
@@ -405,17 +406,17 @@ const Tasks = () => {
                                 <Text style={styles.inputLabel}>公開設定</Text>
                                 <View style={styles.switchRow}>
                                     <Text style={styles.switchLabel}>
-                                        {isPublic ? "公開" : "非公開"}
+                                        {isActive ? "公開" : "非公開"}
                                     </Text>
                                     <Switch
-                                        value={isPublic}
-                                        onValueChange={setIsPublic}
+                                        value={isActive}
+                                        onValueChange={setIsActive}
                                         trackColor={{
                                             false: "#767577",
                                             true: "#4CAF50",
                                         }}
                                         thumbColor={
-                                            isPublic ? "#ffffff" : "#f4f3f4"
+                                            isActive ? "#ffffff" : "#f4f3f4"
                                         }
                                     />
                                 </View>
