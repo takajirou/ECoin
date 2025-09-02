@@ -29,7 +29,26 @@ func HandleMissions(w http.ResponseWriter, r *http.Request) {
 func HandleEditMissions(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPut:
-		// TODO: 更新処理をここに実装
+		var mission models.Mission
+
+		if err := json.NewDecoder(r.Body).Decode(&mission); err != nil {
+			http.Error(w, "リクエストの解析に失敗しました", http.StatusBadRequest)
+			return
+		}
+
+		if mission.ID == 0 {
+			http.Error(w, "IDが指定されていません", http.StatusBadRequest)
+			return
+		}
+
+		if err := mission.UpdateMission(); err != nil {
+			log.Println("UpdateMission エラー:", err)
+			http.Error(w, "ミッションの更新に失敗しました", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(mission)
 
 	case http.MethodDelete:
 		parts := strings.Split(r.URL.Path, "/")

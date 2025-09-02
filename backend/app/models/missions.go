@@ -78,6 +78,20 @@ func GetMission() ([]Mission, error) {
 	return missions, nil
 }
 
+func (m *Mission) UpdateMission() error {
+
+	cmd := `UPDATE missions SET title = ?, description = ?, difficulty = ?, point = ?, require_proof = ?, active = ? 
+			WHERE ID = ?`
+
+	_, err := Db.Exec(cmd, m.Title, m.Description, m.Difficulty, m.Point, m.Require_proof, m.Active, m.ID)
+
+	if err != nil {
+		log.Println("UpdateMission error:", err)
+	}
+
+	return err
+}
+
 // ミッション削除（id指定）
 func DeleteMission(id int) error {
 	cmd := `DELETE FROM missions WHERE id = ?`
