@@ -80,7 +80,7 @@ func GetMission() ([]Mission, error) {
 
 func (m *Mission) UpdateMission() error {
 
-	cmd := `UPDATE missions SET title = ?, description = ?, difficulty = ?, point = ?, require_poof = ?, active = ? 
+	cmd := `UPDATE missions SET title = ?, description = ?, difficulty = ?, point = ?, require_proof = ?, active = ? 
 			WHERE ID = ?`
 
 	_, err := Db.Exec(cmd, m.Title, m.Description, m.Difficulty, m.Point, m.Require_proof, m.Active, m.ID)
