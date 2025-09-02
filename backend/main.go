@@ -15,7 +15,7 @@ import (
 
 func main() {
 	// ミッション作成のコード
-	createMissions := true
+	createMissions := false
 	if createMissions {
 		log.Println("ミッションデータの作成を開始します...")
 
@@ -60,7 +60,7 @@ func main() {
 	}
 
 	// 報酬作成のコード
-	createReward := true
+	createReward := false
 	if createReward {
 		log.Println("リワードデータの作成を開始します...")
 
@@ -100,7 +100,7 @@ func main() {
 		log.Println("リワードデータの作成が完了しました！")
 	}
 
-	createAccounts := true
+	createAccounts := false
 	if createAccounts {
 		log.Println("ユーザーアカウントの作成を開始します...")
 
