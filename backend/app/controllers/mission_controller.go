@@ -73,8 +73,30 @@ func HandleEditMissions(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(resp)
 
+	default:
+		http.Error(w, "許可されていないメソッドです", http.StatusMethodNotAllowed)
+	}
+}
+
+func HandleCreateMission(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
 	case http.MethodPost:
-		// TODO: 新規作成処理をここに実装
+		var mission models.Mission
+
+		if err := json.NewDecoder(r.Body).Decode(&mission); err != nil {
+			http.Error(w, "リクエストの解析に失敗しました", http.StatusBadRequest)
+			return
+		}
+
+		if err := mission.CreateMission(); err != nil {
+			log.Println("CreateMission エラー:", err)
+			http.Error(w, "ミッションの作成に失敗しました", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(mission)
 
 	default:
 		http.Error(w, "許可されていないメソッドです", http.StatusMethodNotAllowed)

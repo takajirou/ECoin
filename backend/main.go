@@ -164,6 +164,10 @@ func main() {
 		middleware.JWTMiddleware(
 			middleware.AdminMiddleware(
 				http.HandlerFunc(controllers.HandleEditMissions))))
+	http.Handle("/api/admin/missions",
+		middleware.JWTMiddleware(
+			middleware.AdminMiddleware(
+				http.HandlerFunc(controllers.HandleCreateMission))))
 
 	// サーバー起動ポート
 	addr := fmt.Sprintf(":%s", config.Config.Port)

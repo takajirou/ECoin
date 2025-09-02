@@ -265,3 +265,11 @@
 2025/09/02 16:07:46 missions.go:89: UpdateMission error: Error 1054 (42S22): Unknown column 'require_poof' in 'field list'
 2025/09/02 16:07:46 mission_controller.go:45: UpdateMission エラー: Error 1054 (42S22): Unknown column 'require_poof' in 'field list'
 2025/09/02 16:08:08 main.go:170: Server started at http://localhost:8080
+2025/09/02 19:52:11 main.go:174: Server started at http://localhost:8080
+2025/09/02 19:53:26 missions.go:41: CreateMission error: Error 1265 (01000): Data truncated for column 'difficulty' at row 1
+2025/09/02 19:53:26 mission_controller.go:92: CreateMission エラー: Error 1265 (01000): Data truncated for column 'difficulty' at row 1
+2025/09/02 19:53:36 missions.go:41: CreateMission error: Error 1265 (01000): Data truncated for column 'difficulty' at row 1
+2025/09/02 19:53:36 mission_controller.go:92: CreateMission エラー: Error 1265 (01000): Data truncated for column 'difficulty' at row 1
+2025/09/02 19:53:47 missions.go:41: CreateMission error: Error 1265 (01000): Data truncated for column 'difficulty' at row 1
+2025/09/02 19:53:47 mission_controller.go:92: CreateMission エラー: Error 1265 (01000): Data truncated for column 'difficulty' at row 1
+2025/09/02 19:56:27 main.go:174: Server started at http://localhost:8080

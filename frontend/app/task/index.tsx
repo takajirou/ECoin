@@ -6,6 +6,7 @@ import { updateCoin } from "libs/users/updateCoin";
 import { useQueryClient } from "@tanstack/react-query";
 import { deleteMissions } from "libs/missions/deleteMission";
 import { updateMission } from "libs/missions/updateMission";
+import { createMission } from "libs/missions/createMission";
 import useProfile from "hooks/useProfile";
 import { Mission } from "types/mission";
 import TaskCard from "@components/tasks/TaskCard";
@@ -44,6 +45,19 @@ const Tasks = () => {
 
     const difficultyOptions = ["簡単", "普通", "難しい"];
 
+    const difficultyOrder: Record<string, number> = {
+        easy: 1,
+        medium: 2,
+        hard: 3,
+    };
+
+    const sortedMissions = [...missions].sort((a, b) => {
+        return (
+            (difficultyOrder[a.difficulty] || 2) -
+            (difficultyOrder[b.difficulty] || 2)
+        );
+    });
+
     const handleMissionPress = (mission: Mission) => {
         setSelectedMissions((prev) => {
             const isSelected = prev.includes(mission.id);
@@ -61,12 +75,17 @@ const Tasks = () => {
 
     // Admin用の編集機能
     const handleEditMission = (mission?: Mission) => {
+        const difficultyMap: Record<string, string> = {
+            easy: "簡単",
+            medium: "普通",
+            hard: "難しい",
+        };
         if (mission) {
             setEditingMission(mission);
             setMissionTitle(mission.title || "");
             setMissionDescription(mission.description || "");
             setMissionPoint(mission.point?.toString() || "");
-            setMissionDifficulty(mission.difficulty || "普通");
+            setMissionDifficulty(difficultyMap[mission.difficulty] || "普通");
             setIsActive(mission.active !== false);
         } else {
             // 新規作成の場合
@@ -86,11 +105,17 @@ const Tasks = () => {
             return;
         }
 
+        const difficultyMap: Record<string, string> = {
+            簡単: "easy",
+            普通: "medium",
+            難しい: "hard",
+        };
+
         try {
             const missionData = {
                 title: missionTitle.trim(),
                 description: missionDescription.trim(),
-                difficulty: missionDifficulty,
+                difficulty: difficultyMap[missionDifficulty] || "medium",
                 point: parseInt(missionPoint),
                 require_proof: false, // デフォルト値
                 active: isActive,
@@ -107,8 +132,7 @@ const Tasks = () => {
                     ...missionData,
                 });
             } else {
-                // 新規ミッション作成
-                // await createMission(missionData);
+                await createMission(missionData);
                 console.log("ミッション作成:", missionData);
             }
 
@@ -256,12 +280,12 @@ const Tasks = () => {
                     )}
                 </View>
 
-                {missions.length === 0 ? (
+                {sortedMissions.length === 0 ? (
                     <View style={styles.centerContainer}>
                         <Text style={styles.emptyText}>タスクがありません</Text>
                     </View>
                 ) : (
-                    missions.map((mission) => (
+                    sortedMissions.map((mission) => (
                         <View key={mission.id} style={styles.missionContainer}>
                             <TaskCard
                                 mission={mission}
