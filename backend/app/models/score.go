@@ -15,7 +15,7 @@ type Score struct {
 }
 
 // period_type と period_value に合致するスコアを取得
-func GetScoreByUserPeriod(userID, periodType, periodValue string) (Score, error) {
+func GetScoreByPeriod(userID, periodType, periodValue string) (Score, error) {
 	var s Score
 	cmd := `SELECT id, user_id, earn_coin, period_type, period_value, created_at
 			FROM score

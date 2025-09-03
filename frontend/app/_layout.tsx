@@ -13,12 +13,10 @@ export default function RootLayout() {
     const [mounted, setMounted] = useState(false);
     const [authChecked, setAuthChecked] = useState(false);
 
-    // コンポーネントがマウントされるまで待つ
     useEffect(() => {
         setMounted(true);
     }, []);
 
-    // マウントされていない場合は基本的なレイアウトのみ表示
     if (!mounted) {
         return (
             <QueryClientProvider client={queryClient}>
