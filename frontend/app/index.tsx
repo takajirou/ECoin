@@ -1,286 +1,243 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-    Text,
-    Button,
-    StyleSheet,
-    SafeAreaView,
-    Alert,
     View,
+    Text,
+    StyleSheet,
+    ScrollView,
     TouchableOpacity,
-    ActivityIndicator,
+    Modal,
 } from "react-native";
 import { router } from "expo-router";
-import { logoutUser, getToken } from "./config";
 
-type RootStackParamList = {
-    Home: undefined;
-    Detail: undefined;
-    SignUp: undefined;
-    Login: undefined;
-};
+const DUMMY_MISSIONS = [
+    { id: 1, title: "電気をこまめに消す", point: 10, difficulty: "easy" },
+    { id: 2, title: "自転車で通勤", point: 20, difficulty: "medium" },
+    { id: 3, title: "マイバッグを持参", point: 15, difficulty: "easy" },
+];
 
-const Home = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [isLoggingOut, setIsLoggingOut] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+const TopDashboard = () => {
+    const [period, setPeriod] = useState<"week" | "month">("week");
 
-    // ログイン状態を確認
-    useEffect(() => {
-        checkLoginStatus();
-    }, []);
+    // ダミーデータ
+    const co2Saved = period === "week" ? 12.5 : 50; // kg
+    const monthlySaving = period === "week" ? 1500 : 6000; // 円
+    const consecutiveDays = 7;
 
-    const checkLoginStatus = async () => {
-        try {
-            const token = await getToken();
-            setIsLoggedIn(!!token);
-        } catch (error) {
-            console.error("ログイン状態の確認に失敗:", error);
-            setIsLoggedIn(false);
-        } finally {
-            setIsLoading(false);
-        }
+    const [isEventModalVisible, setEventModalVisible] = useState(false);
+
+    const togglePeriod = () => {
+        setPeriod(period === "week" ? "month" : "week");
     };
-
-    const handleLogout = async () => {
-        Alert.alert("ログアウト確認", "ログアウトしますか？", [
-            {
-                text: "キャンセル",
-                style: "cancel",
-            },
-            {
-                text: "ログアウト",
-                style: "destructive",
-                onPress: performLogout,
-            },
-        ]);
-    };
-
-    const performLogout = async () => {
-        setIsLoggingOut(true);
-        try {
-            const result = await logoutUser();
-
-            if (result.success) {
-                setIsLoggedIn(false);
-                Alert.alert("ログアウト完了", "正常にログアウトしました", [
-                    {
-                        text: "OK",
-                        onPress: () => {
-                            router.replace("/auth/Login");
-                        },
-                    },
-                ]);
-            } else {
-                Alert.alert(
-                    "エラー",
-                    result.error || "ログアウトに失敗しました"
-                );
-            }
-        } catch (error) {
-            console.error("ログアウトエラー:", error);
-            Alert.alert("エラー", "ログアウト処理中にエラーが発生しました");
-        } finally {
-            setIsLoggingOut(false);
-        }
-    };
-
-    if (isLoading) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="#4CAF50" />
-                    <Text style={styles.loadingText}>読み込み中...</Text>
-                </View>
-            </SafeAreaView>
-        );
-    }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.content}>
-                <Text style={styles.title}>ホーム画面</Text>
-
-                {isLoggedIn ? (
-                    <View style={styles.loggedInSection}>
-                        <Text style={styles.statusText}>ログイン中</Text>
-
-                        <TouchableOpacity
-                            style={[
-                                styles.logoutButton,
-                                isLoggingOut && styles.disabledButton,
-                            ]}
-                            onPress={handleLogout}
-                            disabled={isLoggingOut}
-                        >
-                            {isLoggingOut ? (
-                                <View style={styles.buttonContent}>
-                                    <ActivityIndicator
-                                        size="small"
-                                        color="white"
-                                        style={styles.buttonLoader}
-                                    />
-                                    <Text style={styles.logoutButtonText}>
-                                        ログアウト中...
-                                    </Text>
-                                </View>
-                            ) : (
-                                <Text style={styles.logoutButtonText}>
-                                    ログアウト
-                                </Text>
-                            )}
-                        </TouchableOpacity>
-                    </View>
-                ) : (
-                    <View style={styles.authButtons}>
-                        <TouchableOpacity
-                            style={styles.signUpButton}
-                            onPress={() => router.push("/auth/SignUp")}
-                        >
-                            <Text style={styles.signUpButtonText}>
-                                新規登録
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.loginButton}
-                            onPress={() => router.push("/auth/Login")}
-                        >
-                            <Text style={styles.loginButtonText}>ログイン</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
-
-                {/* リフレッシュボタン（デバッグ用） */}
+        <ScrollView style={styles.container}>
+            {/* 節約額切替 */}
+            <View style={styles.periodSwitchContainer}>
                 <TouchableOpacity
-                    style={styles.refreshButton}
-                    onPress={checkLoginStatus}
+                    onPress={togglePeriod}
+                    style={styles.periodButton}
                 >
-                    <Text style={styles.refreshButtonText}>状態を更新</Text>
+                    <Text style={styles.periodButtonText}>
+                        {period === "week" ? "今週" : "今月"}の統計に切替
+                    </Text>
                 </TouchableOpacity>
             </View>
-        </SafeAreaView>
+
+            {/* 節約額表示 */}
+            <View style={styles.savingContainer}>
+                <Text style={styles.savingTitle}>節約金額</Text>
+                <Text style={styles.savingValue}>{monthlySaving} 円</Text>
+            </View>
+
+            {/* CO2削減量 */}
+            <View style={styles.co2Container}>
+                <Text style={styles.co2Title}>CO₂削減量</Text>
+                <Text style={styles.co2Value}>{co2Saved} kg</Text>
+            </View>
+
+            {/* 今日のおすすめミッション */}
+            <View style={styles.missionContainer}>
+                <Text style={styles.sectionTitle}>
+                    今日のおすすめミッション
+                </Text>
+                {DUMMY_MISSIONS.slice(0, 1).map((mission) => (
+                    <View key={mission.id} style={styles.missionCard}>
+                        <Text style={styles.missionTitle}>{mission.title}</Text>
+                        <Text style={styles.missionPoint}>
+                            {mission.point} pt
+                        </Text>
+                    </View>
+                ))}
+            </View>
+
+            {/* ランキングボタン */}
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => router.push("/ranking")}
+            >
+                <Text style={styles.buttonText}>ランキングを見る</Text>
+            </TouchableOpacity>
+
+            {/* イベントボタン */}
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => setEventModalVisible(true)}
+            >
+                <Text style={styles.buttonText}>イベントを確認</Text>
+            </TouchableOpacity>
+
+            {/* イベントモーダル */}
+            <Modal
+                visible={isEventModalVisible}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setEventModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalTitle}>イベント詳細</Text>
+                        <Text style={styles.modalContent}>
+                            ここにイベント内容を表示します（ダミーデータ）
+                        </Text>
+                        <TouchableOpacity
+                            style={styles.closeButton}
+                            onPress={() => setEventModalVisible(false)}
+                        >
+                            <Text style={styles.closeButtonText}>閉じる</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         backgroundColor: "#f5f5f5",
-        flex: 1,
+        padding: 16,
     },
-    content: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingHorizontal: 20,
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: "center",
+    periodSwitchContainer: {
+        marginBottom: 16,
         alignItems: "center",
     },
-    loadingText: {
-        marginTop: 10,
+    periodButton: {
+        backgroundColor: "#4CAF50",
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+    },
+    periodButtonText: {
+        color: "#fff",
+        fontWeight: "bold",
+    },
+    savingContainer: {
+        backgroundColor: "#fff",
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 16,
+        alignItems: "center",
+    },
+    savingTitle: {
         fontSize: 16,
-        color: "#666",
+        color: "#333",
     },
-    title: {
-        fontSize: 28,
+    savingValue: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#4CAF50",
+        marginTop: 8,
+    },
+    co2Container: {
+        backgroundColor: "#fff",
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 16,
+        alignItems: "center",
+    },
+    co2Title: {
+        fontSize: 16,
+        color: "#333",
+    },
+    co2Value: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#2196F3",
+        marginTop: 8,
+    },
+    missionContainer: {
+        marginBottom: 16,
+    },
+    sectionTitle: {
+        fontSize: 18,
         fontWeight: "bold",
         color: "#333",
-        marginBottom: 30,
+        marginBottom: 8,
     },
-    loggedInSection: {
-        alignItems: "center",
-        width: "100%",
-    },
-    statusText: {
-        fontSize: 18,
-        color: "#4CAF50",
-        fontWeight: "600",
-        marginBottom: 30,
-    },
-    authButtons: {
-        width: "100%",
-        alignItems: "center",
-    },
-    signUpButton: {
-        backgroundColor: "#4CAF50",
-        paddingVertical: 15,
-        paddingHorizontal: 40,
-        borderRadius: 25,
-        marginBottom: 15,
-        width: "80%",
-        alignItems: "center",
-        elevation: 2,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-    },
-    signUpButtonText: {
-        color: "white",
-        fontSize: 16,
-        fontWeight: "bold",
-    },
-    loginButton: {
-        backgroundColor: "#2196F3",
-        paddingVertical: 15,
-        paddingHorizontal: 40,
-        borderRadius: 25,
-        width: "80%",
-        alignItems: "center",
-        elevation: 2,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-    },
-    loginButtonText: {
-        color: "white",
-        fontSize: 16,
-        fontWeight: "bold",
-    },
-    logoutButton: {
-        backgroundColor: "#f44336",
-        paddingVertical: 15,
-        paddingHorizontal: 40,
-        borderRadius: 25,
-        width: "80%",
-        alignItems: "center",
-        elevation: 2,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-    },
-    logoutButtonText: {
-        color: "white",
-        fontSize: 16,
-        fontWeight: "bold",
-    },
-    disabledButton: {
-        backgroundColor: "#999",
-        elevation: 0,
-        shadowOpacity: 0,
-    },
-    buttonContent: {
+    missionCard: {
+        backgroundColor: "#fff",
+        borderRadius: 12,
+        padding: 12,
+        marginBottom: 8,
         flexDirection: "row",
+        justifyContent: "space-between",
+    },
+    missionTitle: {
+        fontSize: 16,
+        color: "#333",
+    },
+    missionPoint: {
+        fontSize: 16,
+        color: "#4CAF50",
+        fontWeight: "bold",
+    },
+    button: {
+        backgroundColor: "#4CAF50",
+        paddingVertical: 12,
+        borderRadius: 12,
+        marginBottom: 12,
         alignItems: "center",
     },
-    buttonLoader: {
-        marginRight: 8,
+    buttonText: {
+        color: "#fff",
+        fontWeight: "bold",
+        fontSize: 16,
     },
-    refreshButton: {
-        marginTop: 30,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 15,
-        backgroundColor: "#E0E0E0",
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        justifyContent: "center",
+        alignItems: "center",
     },
-    refreshButtonText: {
-        color: "#666",
-        fontSize: 14,
+    modalContainer: {
+        backgroundColor: "#fff",
+        borderRadius: 12,
+        padding: 20,
+        width: "80%",
+        alignItems: "center",
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        marginBottom: 12,
+    },
+    modalContent: {
+        fontSize: 16,
+        color: "#333",
+        marginBottom: 20,
+        textAlign: "center",
+    },
+    closeButton: {
+        backgroundColor: "#4CAF50",
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+    },
+    closeButtonText: {
+        color: "#fff",
+        fontWeight: "bold",
     },
 });
 
-export default Home;
+export default TopDashboard;

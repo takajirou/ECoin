@@ -11,6 +11,7 @@ type Mission struct {
 	Description   string    `json:"description"`
 	Difficulty    string    `json:"difficulty"`
 	Point         int       `json:"point"`
+	Saved_amount  int       `json:"saved_amount"`
 	Require_proof bool      `json:"require_proof"`
 	Active        bool      `json:"active"`
 	CreatedAt     time.Time `json:"created_at"`
@@ -23,15 +24,17 @@ func (m *Mission) CreateMission() error {
 		description,
 		difficulty,
 		point,
+		saved_amount,
 		require_proof,
 		active,
-		created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`
+		created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 
 	_, err := Db.Exec(cmd,
 		m.Title,
 		m.Description,
 		m.Difficulty,
 		m.Point,
+		m.Saved_amount,
 		m.Require_proof,
 		m.Active,
 		time.Now(),
@@ -46,7 +49,7 @@ func (m *Mission) CreateMission() error {
 
 // 複数ミッション取得（active = true のみ）
 func GetMission() ([]Mission, error) {
-	cmd := `SELECT id, title, description, difficulty, point, require_proof, active, created_at FROM missions WHERE active = true`
+	cmd := `SELECT id, title, description, difficulty, point, saved_amount, require_proof, active, created_at FROM missions WHERE active = true`
 
 	rows, err := Db.Query(cmd)
 	if err != nil {
@@ -64,6 +67,7 @@ func GetMission() ([]Mission, error) {
 			&m.Description,
 			&m.Difficulty,
 			&m.Point,
+			&m.Saved_amount,
 			&m.Require_proof,
 			&m.Active,
 			&m.CreatedAt,
@@ -80,10 +84,10 @@ func GetMission() ([]Mission, error) {
 
 func (m *Mission) UpdateMission() error {
 
-	cmd := `UPDATE missions SET title = ?, description = ?, difficulty = ?, point = ?, require_proof = ?, active = ? 
+	cmd := `UPDATE missions SET title = ?, description = ?, difficulty = ?, point = ?, saved_amount = ?, require_proof = ?, active = ? 
 			WHERE ID = ?`
 
-	_, err := Db.Exec(cmd, m.Title, m.Description, m.Difficulty, m.Point, m.Require_proof, m.Active, m.ID)
+	_, err := Db.Exec(cmd, m.Title, m.Description, m.Difficulty, m.Point, m.Saved_amount, m.Require_proof, m.Active, m.ID)
 
 	if err != nil {
 		log.Println("UpdateMission error:", err)

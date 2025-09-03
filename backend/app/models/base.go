@@ -45,24 +45,24 @@ func init() {
 
 	// // すべてのテーブルをDROP（依存関係の逆順）
 	// dropTables := []string{
-	//     tableNameUserEvents,
-	//     tableNameUserRewards,
-	//     tableNameMissionStats,
-	//     tableNameScore,
-	//     tableNameEvents,
-	//     tableNameRewards,
-	//     tableNameMission,
-	//     tableNameUser,
+	// 	tableNameUserEvents,
+	// 	tableNameUserRewards,
+	// 	tableNameMissionStats,
+	// 	tableNameScore,
+	// 	tableNameEvents,
+	// 	tableNameRewards,
+	// 	tableNameMission,
+	// 	tableNameUser,
 	// }
 
 	// for _, tableName := range dropTables {
-	//     cmdDrop := fmt.Sprintf(`DROP TABLE IF EXISTS %s`, tableName)
-	//     if _, err := Db.Exec(cmdDrop); err != nil {
-	//         log.Printf("テーブル削除エラー %s: %v", tableName, err)
-	//     }
+	// 	cmdDrop := fmt.Sprintf(`DROP TABLE IF EXISTS %s`, tableName)
+	// 	if _, err := Db.Exec(cmdDrop); err != nil {
+	// 		log.Printf("テーブル削除エラー %s: %v", tableName, err)
+	// 	}
 	// }
 
-	// // 外部キー制約を再有効化
+	// // // 外部キー制約を再有効化
 	// Db.Exec("SET FOREIGN_KEY_CHECKS = 1")
 
 	dropReward := false // 実行したい時はtrueに変更
@@ -109,6 +109,7 @@ func init() {
 		description TEXT,
 		difficulty ENUM('easy', 'medium', 'hard'),
 		point INT,
+		saved_amount INT,
 		require_proof BOOLEAN DEFAULT false,
 		active BOOLEAN DEFAULT true,
 		created_at DATETIME
