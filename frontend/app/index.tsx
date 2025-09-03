@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     Modal,
 } from "react-native";
+import { router } from "expo-router";
 
 const DUMMY_MISSIONS = [
     { id: 1, title: "電気をこまめに消す", point: 10, difficulty: "easy" },
@@ -70,7 +71,10 @@ const TopDashboard = () => {
             </View>
 
             {/* ランキングボタン */}
-            <TouchableOpacity style={styles.button} onPress={() => {}}>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => router.push("/ranking")}
+            >
                 <Text style={styles.buttonText}>ランキングを見る</Text>
             </TouchableOpacity>
 
