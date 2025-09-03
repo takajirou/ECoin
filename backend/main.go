@@ -34,6 +34,7 @@ func main() {
 	// 認証が必要なエンドポイント（一般ユーザー用）
 	http.Handle("/api/me", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMe)))
 	http.Handle("/api/profile", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMyProfile)))
+	http.Handle("/api/saved", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleSavedAmount)))
 	http.Handle("/api/status/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMissionStats)))
 	http.Handle("/api/ranking", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleRankingWithUsers)))
 	http.Handle("/api/score/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserScore)))
