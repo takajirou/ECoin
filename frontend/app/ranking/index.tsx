@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     View,
     Text,
@@ -7,6 +7,8 @@ import {
     Platform,
     TouchableOpacity,
 } from "react-native";
+import { useRanking } from "hooks/useRanking";
+import { RankingResponse } from "types/ranking";
 
 const DUMMY_RANKINGS = [
     { id: 1, name: "田中 太郎", points: 150 },
@@ -17,9 +19,68 @@ const DUMMY_RANKINGS = [
 ];
 
 const RankingScreen = () => {
+    const [ranking, setRanking] = useState<RankingResponse[]>([]);
     const [period, setPeriod] = useState<"week" | "month">("week");
     const [weekOffset, setWeekOffset] = useState(0); // 0=今週, -1=先週
     const [monthOffset, setMonthOffset] = useState(0); // 0=今月, -1=先月
+
+    function getWeekNumber(d: Date) {
+        const date = new Date(d.getTime());
+        date.setHours(0, 0, 0, 0);
+        // 木曜日を基準にしてISO週番号を計算
+        date.setDate(date.getDate() + 4 - (date.getDay() || 7));
+        const yearStart = new Date(date.getFullYear(), 0, 1);
+        const weekNo = Math.ceil(
+            ((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7
+        );
+        return `${date.getFullYear()}-${weekNo.toString().padStart(2, "0")}`;
+    }
+
+    const getPeriodValue = () => {
+        const now = new Date();
+
+        if (period === "week") {
+            // weekOffset を反映した日付を取得
+            const targetDate = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() + weekOffset * 7
+            );
+
+            // ISO 週番号を計算（木曜日を基準）
+            const date = new Date(targetDate.getTime());
+            date.setHours(0, 0, 0, 0);
+            date.setDate(date.getDate() + 4 - (date.getDay() || 7));
+
+            const yearStart = new Date(date.getFullYear(), 0, 1);
+            const weekNo = Math.ceil(
+                ((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7
+            );
+
+            return `${date.getFullYear()}-${weekNo.toString().padStart(2, "0")}`; // YYYY-WW
+        } else {
+            // monthOffset を反映した日付を取得
+            const targetDate = new Date(
+                now.getFullYear(),
+                now.getMonth() + monthOffset,
+                1
+            );
+
+            // ローカル時間で年・月を取得
+            const year = targetDate.getFullYear();
+            const month = (targetDate.getMonth() + 1)
+                .toString()
+                .padStart(2, "0");
+
+            return `${year}-${month}`; // YYYY-MM
+        }
+    };
+
+    const {
+        data: rankingData,
+        isLoading,
+        error,
+    } = useRanking(period, getPeriodValue());
 
     const handlePrev = () => {
         if (period === "week") {
@@ -56,6 +117,8 @@ const RankingScreen = () => {
     const canGoNext =
         (period === "week" && weekOffset < 0) ||
         (period === "month" && monthOffset < 0);
+
+    console.log(getPeriodValue());
 
     return (
         <View style={styles.container}>
@@ -95,17 +158,21 @@ const RankingScreen = () => {
             {/* ランキング一覧 */}
             <ScrollView style={styles.scroll}>
                 <Text style={styles.title}>ランキング</Text>
-                {DUMMY_RANKINGS.map((user, index) => (
-                    <View key={user.id} style={styles.rankCard}>
-                        <Text style={styles.rankNumber}>{index + 1}</Text>
-                        <View style={styles.userInfo}>
-                            <Text style={styles.userName}>{user.name}</Text>
-                            <Text style={styles.userPoints}>
-                                {user.points} pt
-                            </Text>
-                        </View>
-                    </View>
-                ))}
+                {rankingData && Array.isArray(rankingData)
+                    ? rankingData.map((user, index) => (
+                          <View key={user.UUID} style={styles.rankCard}>
+                              <Text style={styles.rankNumber}>{index + 1}</Text>
+                              <View style={styles.userInfo}>
+                                  <Text style={styles.userName}>
+                                      {user.UserName}
+                                  </Text>
+                                  <Text style={styles.userPoints}>
+                                      {user.Score} pt
+                                  </Text>
+                              </View>
+                          </View>
+                      ))
+                    : null}
             </ScrollView>
         </View>
     );
