@@ -35,7 +35,7 @@ func main() {
 	http.Handle("/api/me", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMe)))
 	http.Handle("/api/profile", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMyProfile)))
 	http.Handle("/api/status/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleMissionStats)))
-	http.Handle("/api/ranking", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleScore)))
+	http.Handle("/api/ranking", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleRankingWithUsers)))
 	http.Handle("/api/score/", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserScore)))
 	http.Handle("/api/user/coin/plus", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserCoin)))
 	http.Handle("/api/user/coin/minus", middleware.JWTMiddleware(http.HandlerFunc(controllers.HandleUserCoin)))

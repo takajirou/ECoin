@@ -2,9 +2,7 @@ package seeds
 
 import (
 	"ECoin/app/models"
-	"fmt"
 	"log"
-	"math/rand/v2"
 	"time"
 )
 
@@ -118,37 +116,6 @@ func SeedRewards() {
 		}
 	}
 	log.Println("リワードデータの作成が完了しました！")
-}
-
-// SeedScores は全ユーザーのスコアを作成
-func SeedScores() {
-	log.Println("全ユーザーのスコア作成を開始します...")
-	err := SeedScoresForAllUsers()
-	if err != nil {
-		log.Printf("スコア作成に失敗: %v\n", err)
-	} else {
-		log.Println("全ユーザーのスコア作成が完了しました！")
-	}
-}
-
-func SeedScoresForAllUsers() error {
-	users, err := models.GetAllUsers()
-	if err != nil {
-		return fmt.Errorf("ユーザー取得に失敗: %w", err)
-	}
-
-	for _, user := range users {
-		// 適当なスコアを作成（例: 0～200）
-		score := rand.IntN(201)
-
-		// 週・月ごとにスコアをアップサート
-		err := models.UpsertScoreAllPeriods(user.UUID, score)
-		if err != nil {
-			return fmt.Errorf("ユーザー %s のスコア更新失敗: %w", user.UUID, err)
-		}
-	}
-
-	return nil
 }
 
 // SeedUsers はユーザーアカウントを作成
