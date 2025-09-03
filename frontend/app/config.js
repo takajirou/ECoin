@@ -12,9 +12,8 @@ export const setToken = async (token) => {
             await AsyncStorage.setItem(TOKEN_KEY, token);
 
             // デフォルトヘッダーに設定
-            apiClient.defaults.headers.common[
-                "Authorization"
-            ] = `Bearer ${token}`;
+            apiClient.defaults.headers.common["Authorization"] =
+                `Bearer ${token}`;
 
             console.log("トークンを設定しました");
         }
@@ -77,9 +76,8 @@ export const initializeAuth = async () => {
         const token = await getToken();
         if (token) {
             // トークンをヘッダーに設定
-            apiClient.defaults.headers.common[
-                "Authorization"
-            ] = `Bearer ${token}`;
+            apiClient.defaults.headers.common["Authorization"] =
+                `Bearer ${token}`;
 
             // トークンの有効性を確認
             const isValid = await checkTokenValidity();
@@ -195,3 +193,8 @@ export const logoutUser = async () => {
         };
     }
 };
+const config = () => {
+    return "config";
+};
+
+export default config;
