@@ -218,11 +218,21 @@ const Tasks = () => {
             await updateCoin("plus", totalScore);
 
             // 強制的にrefetch（キャッシュを無視）
-            await queryClient.refetchQueries({
-                queryKey: ["fetchProfile"],
-                exact: false,
-                type: "active", // アクティブなクエリのみ
-            });
+            await Promise.all([
+                queryClient.refetchQueries({
+                    queryKey: ["fetchProfile"],
+                    exact: false,
+                    type: "active",
+                }),
+                queryClient.invalidateQueries({
+                    queryKey: ["saved_amount", "month"],
+                    exact: false,
+                }),
+                queryClient.invalidateQueries({
+                    queryKey: ["saved_amount", "week"],
+                    exact: false,
+                }),
+            ]);
 
             Alert.alert(
                 "ミッション達成！",
