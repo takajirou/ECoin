@@ -34,7 +34,7 @@ func SeedUpsertScore(userID string, periodType string, date time.Time, score int
 // GetSeedYearWeekForDate は指定された日付の年週を取得（シード用）
 func GetSeedYearWeekForDate(date time.Time) string {
 	year, week := date.ISOWeek()
-	return fmt.Sprintf("%d-W%02d", year, week)
+	return fmt.Sprintf("%d-%02d", year, week)
 }
 
 // GetSeedYearMonthForDate は指定された日付の年月を取得（シード用）
