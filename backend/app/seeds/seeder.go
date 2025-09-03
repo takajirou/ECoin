@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-// SeedOptions はシード処理のオプションを定義
 type SeedOptions struct {
 	CreateDefaultData bool
 	CreateMissions    bool
@@ -15,7 +14,6 @@ type SeedOptions struct {
 	CreateScore       bool
 }
 
-// RunSeeds は指定されたオプションに基づいてシード処理を実行
 func RunSeeds(opts SeedOptions) {
 	if opts.CreateMissions || opts.CreateDefaultData {
 		SeedMissions()
@@ -34,7 +32,6 @@ func RunSeeds(opts SeedOptions) {
 	}
 }
 
-// SeedMissions はミッションデータを作成
 func SeedMissions() {
 	log.Println("ミッションデータの作成を開始します...")
 
@@ -78,7 +75,6 @@ func SeedMissions() {
 	log.Println("ミッションデータの作成が完了しました！")
 }
 
-// SeedRewards はリワードデータを作成
 func SeedRewards() {
 	log.Println("リワードデータの作成を開始します...")
 
@@ -118,7 +114,7 @@ func SeedRewards() {
 	log.Println("リワードデータの作成が完了しました！")
 }
 
-// SeedUsers はユーザーアカウントを作成
+
 func SeedUsers() {
 	log.Println("ユーザーアカウントの作成を開始します...")
 

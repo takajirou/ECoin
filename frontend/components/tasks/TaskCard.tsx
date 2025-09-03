@@ -91,7 +91,7 @@ const TaskCard: React.FC<TaskCard> = ({ mission, isSelected, onPress }) => {
                 )}
             </View>
 
-            {/* 選択インジケーター（必要に応じてコメントアウト解除）
+            {/* 選択インジケーター
             {isSelected && (
                 <View style={styles.selectedIndicator}>
                     <Text style={styles.selectedIndicatorText}>
