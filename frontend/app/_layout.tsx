@@ -89,7 +89,7 @@ function AuthenticatedLayout() {
                     </Stack>
                 </View>
             </View>
-            <Footer />
+            {!isAuthPage && <Footer />}
         </View>
     );
 }
