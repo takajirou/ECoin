@@ -38,20 +38,24 @@ const TopDashboard = () => {
                     style={styles.periodButton}
                 >
                     <Text style={styles.periodButtonText}>
-                        {period === "week" ? "今週" : "今月"}の統計に切替
+                        {period === "week" ? "今月" : "今週"}の統計に切替
                     </Text>
                 </TouchableOpacity>
             </View>
 
             {/* 節約額表示 */}
             <View style={styles.savingContainer}>
-                <Text style={styles.savingTitle}>節約金額</Text>
+                <Text style={styles.savingTitle}>
+                    {period === "week" ? "今週" : "今月"}の節約金額目安
+                </Text>
                 <Text style={styles.savingValue}>{monthlySaving} 円</Text>
             </View>
 
             {/* CO2削減量 */}
             <View style={styles.co2Container}>
-                <Text style={styles.co2Title}>CO₂削減量</Text>
+                <Text style={styles.co2Title}>
+                    {period === "week" ? "今週" : "今月"}のCO₂削減量目安
+                </Text>
                 <Text style={styles.co2Value}>{co2Saved} kg</Text>
             </View>
 
@@ -83,7 +87,7 @@ const TopDashboard = () => {
                 style={styles.button}
                 onPress={() => setEventModalVisible(true)}
             >
-                <Text style={styles.buttonText}>イベントを確認</Text>
+                <Text style={styles.buttonText}>イベントを探す</Text>
             </TouchableOpacity>
 
             {/* イベントモーダル */}
