@@ -8,6 +8,7 @@ import {
     Modal,
 } from "react-native";
 import { router } from "expo-router";
+import { useSavedAmount } from "hooks/useSavedAmount";
 
 const DUMMY_MISSIONS = [
     { id: 1, title: "電気をこまめに消す", point: 10, difficulty: "easy" },
@@ -20,8 +21,8 @@ const TopDashboard = () => {
 
     // ダミーデータ
     const co2Saved = period === "week" ? 12.5 : 50; // kg
-    const monthlySaving = period === "week" ? 1500 : 6000; // 円
-    const consecutiveDays = 7;
+
+    const { data: amountData, isLoading, error } = useSavedAmount(period);
 
     const [isEventModalVisible, setEventModalVisible] = useState(false);
 
@@ -48,7 +49,9 @@ const TopDashboard = () => {
                 <Text style={styles.savingTitle}>
                     {period === "week" ? "今週" : "今月"}の節約金額目安
                 </Text>
-                <Text style={styles.savingValue}>{monthlySaving} 円</Text>
+                <Text style={styles.savingValue}>
+                    {amountData ? amountData.saved_amount : 0} 円
+                </Text>
             </View>
 
             {/* CO2削減量 */}

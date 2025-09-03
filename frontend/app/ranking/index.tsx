@@ -19,7 +19,6 @@ const DUMMY_RANKINGS = [
 ];
 
 const RankingScreen = () => {
-    const [ranking, setRanking] = useState<RankingResponse[]>([]);
     const [period, setPeriod] = useState<"week" | "month">("week");
     const [weekOffset, setWeekOffset] = useState(0); // 0=今週, -1=先週
     const [monthOffset, setMonthOffset] = useState(0); // 0=今月, -1=先月
