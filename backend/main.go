@@ -15,7 +15,7 @@ import (
 func main() {
 	// シード処理のオプション設定
 	seedOpts := seeds.SeedOptions{
-		CreateDefaultData: true,
+		CreateDefaultData: false,
 		CreateMissions:    false,
 		CreateReward:      false,
 		CreateAccounts:    false,
