@@ -129,7 +129,10 @@ const RankingScreen = () => {
                     onPress={togglePeriod}
                 >
                     <Text style={styles.toggleText}>
-                        {period === "week" ? "週ランキング" : "月ランキング"}
+                        {period === "week"
+                            ? "月間ランキング"
+                            : "週間ランキング"}
+                        に変更
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -157,7 +160,9 @@ const RankingScreen = () => {
 
             {/* ランキング一覧 */}
             <ScrollView style={styles.scroll}>
-                <Text style={styles.title}>ランキング</Text>
+                <Text style={styles.title}>
+                    {period === "week" ? "週間" : "月間"}ランキング
+                </Text>
                 {rankingData && Array.isArray(rankingData)
                     ? rankingData.map((user, index) => (
                           <View key={user.UUID} style={styles.rankCard}>
