@@ -15,12 +15,23 @@ type Score struct {
 }
 
 // period_type と period_value に合致するスコアを取得
-func GetScoreByPeriod(userID, periodType, periodValue string) (Score, error) {
+func GetUserScoreByPeriod(userID, periodType, periodValue string) (Score, error) {
 	var s Score
 	cmd := `SELECT id, user_id, earn_coin, period_type, period_value, created_at
 			FROM score
 			WHERE user_id = ? AND period_type = ? AND period_value = ?`
 	err := Db.QueryRow(cmd, userID, periodType, periodValue).Scan(
+		&s.ID, &s.UserID, &s.EarnCoin, &s.PeriodType, &s.PeriodValue, &s.CreatedAt,
+	)
+	return s, err
+}
+
+func GetRanking(periodType, periodValue string) (Score, error) {
+	var s Score
+	cmd := `SELECT id, user_id, earn_coin, period_type, period_value, created_at
+			FROM score
+			WHERE period_type = ? AND period_value = ?`
+	err := Db.QueryRow(cmd, periodType, periodValue).Scan(
 		&s.ID, &s.UserID, &s.EarnCoin, &s.PeriodType, &s.PeriodValue, &s.CreatedAt,
 	)
 	return s, err

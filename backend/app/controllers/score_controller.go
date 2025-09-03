@@ -50,7 +50,7 @@ func HandleUserScore(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		score, err := models.GetScoreByUserPeriod(claims.UUID, periodType, periodValue)
+		score, err := models.GetUserScoreByPeriod(claims.UUID, periodType, periodValue)
 		if err != nil {
 			http.Error(w, "スコアが見つかりません", http.StatusNotFound)
 			return
@@ -61,5 +61,27 @@ func HandleUserScore(w http.ResponseWriter, r *http.Request) {
 
 	default:
 		http.Error(w, "許可されていないメソッドです", http.StatusMethodNotAllowed)
+	}
+}
+
+func HandleScore(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		periodType := r.URL.Query().Get("period_type")
+		periodValue := r.URL.Query().Get("period_value")
+
+		if periodType == "" || periodValue == "" {
+			http.Error(w, "period_type と period_value は必須です", http.StatusBadRequest)
+			return
+		}
+
+		score, err := models.GetRanking(periodType, periodValue)
+		if err != nil {
+			http.Error(w, "スコアが見つかりません", http.StatusNotFound)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(score)
 	}
 }
